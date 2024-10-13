@@ -1,5 +1,5 @@
-import type { VoiceTrigger } from "types";
-import { timerService } from "timers/timer_service";
+import type { VoiceTrigger } from "../../types.ts";
+import { timerService } from "../../timers/timer_service";
 import { TextChannel } from "discord.js";
 
 

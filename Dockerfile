@@ -1,4 +1,4 @@
-FROM oven/bun AS build
+FROM oven/bun:latest
 
 WORKDIR /app
 
@@ -9,12 +9,6 @@ RUN bun install --frozen-lockfile
 
 COPY src ./src
 
-RUN bun build ./src/index.ts --compile --outfile bot
+USER bun
 
-FROM ubuntu:22.04
-
-WORKDIR /app
-
-COPY --from=build /app/cli /app/cli
-
-CMD ["/app/bot"]
+ENTRYPOINT ["bun", "run", "start"]

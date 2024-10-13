@@ -1,0 +1,21 @@
+networks:
+  timerbot:
+    driver: bridge
+
+services:
+  timerbot:
+    extends:
+      file: compose.yaml
+      service: timerbot
+    environment:
+      - NODE_ENV=development
+      - REDIS_HOST=redis
+    volumes:
+      - './src:/app/src:ro'
+      - './.env:/app/.env:ro'
+      - './logs:/app/logs:rw'
+    command: bun run dev
+  redis:
+    extends:
+      file: compose.yaml
+      service: redis

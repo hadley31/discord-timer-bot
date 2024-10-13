@@ -1,5 +1,5 @@
-import { timerService } from 'timers/timer_service'
-import type { TextTrigger } from '../../types'
+import { timerService } from '../../timers/timer_service'
+import type { TextTrigger } from '../../types.ts'
 import { ChannelType, VoiceChannel, type Message } from 'discord.js'
 
 const onInRegex = /(?:in|me|gimmie|need|^)\s*(?:like|around|a?bout|~)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h)?/i
@@ -98,7 +98,7 @@ const trigger = <TextTrigger>{
             return
         }
 
-        const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members)
+        const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members.size > 0)
 
         if (!userInVoiceChannel) {
             console.log('No voice channels with members')

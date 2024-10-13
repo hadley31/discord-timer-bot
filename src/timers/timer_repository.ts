@@ -1,4 +1,4 @@
-import { Timer } from "types";
+import type { Timer } from "../types.ts";
 
 export interface TimerRepository {
     saveTimer(timer: Timer): Timer

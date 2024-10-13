@@ -1,4 +1,4 @@
-import type { Timer } from "types"
+import type { Timer } from "../types.ts"
 import { SimpleTimerRepository, TimerRepository } from "./timer_repository"
 
 export class TimerService {
