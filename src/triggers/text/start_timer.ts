@@ -3,7 +3,7 @@ import { timerService } from '../../timers/timer_service'
 import type { TextTrigger } from '../../types.ts'
 import { ChannelType, VoiceChannel, type Message } from 'discord.js'
 
-const onInRegex = /(?:in|me|gimmi?e|need|^)\s*(?:around|a?bout|~)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
+const onInRegex = /(?:in|me|gimmi?e|need|maybe|^)\s*(?:around|a?bout|~)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
 const onAtRegex = /(?:ou?n|joining|join|can|play)\s*(?:at|around|a?bout|~)\s*(?:like)?\s*([\d:]+\s*)/i
 
 const regexes = [onInRegex, onAtRegex]
