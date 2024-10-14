@@ -121,17 +121,17 @@ const trigger = <TextTrigger>{
             return
         }
 
+        const endTime = calculateJoinTime(message.content)
+
+        if (endTime == null) {
+            console.error('Error while parsing time')
+            return
+        }
+
         const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members.size > 0)
 
         if (!userInVoiceChannel) {
             console.log('No voice channels with members')
-            return
-        }
-
-        const endTime = calculateJoinTime(message.content)
-
-        if (endTime == null) {
-            console.error('Could not parse time')
             return
         }
 
