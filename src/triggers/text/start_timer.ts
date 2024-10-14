@@ -1,7 +1,7 @@
 import moment from 'moment-timezone'
 import { timerService } from '../../services'
 import type { TextTrigger } from '../../types'
-import { ChannelType, type VoiceChannel, type Message } from 'discord.js'
+import type { Message } from 'discord.js'
 
 const onInRegex = /(?:in|me|gimmi?e|need|maybe|^)\s*(?:around|a?bout|~)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
 const onAtRegex = /(?:ou?n|joining|join|can|play)\s*(?:at|around|a?bout|~)\s*(?:like)?\s*([\d:]+\s*)/i
