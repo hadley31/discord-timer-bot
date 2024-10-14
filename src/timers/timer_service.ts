@@ -1,15 +1,15 @@
-import moment = require("moment-timezone")
-import type { Timer } from "../types.ts"
-import { SimpleTimerRepository, TimerRepository } from "./timer_repository"
+import moment from "moment-timezone"
+import type { Timer } from "../types"
+import { TimerRepository } from "./timer_repository"
 
 export class TimerService {
     private timerRepository: TimerRepository
 
-    constructor(timerRepository: TimerRepository = new SimpleTimerRepository()) {
+    constructor(timerRepository: TimerRepository) {
         this.timerRepository = timerRepository
     }
 
-    createTimer(userId: string, channelId: string, guildId: string, expiration: moment.Moment): Timer {
+    async createTimer(userId: string, channelId: string, guildId: string, expiration: moment.Moment): Promise<Timer> {
         const timer = <Timer>{
             userId,
             channelId,
@@ -22,19 +22,20 @@ export class TimerService {
         return this.timerRepository.saveTimer(timer)
     }
 
-    saveTimer(timer: Timer): Timer {
+    async saveTimer(timer: Timer): Promise<Timer> {
         return this.timerRepository.saveTimer(timer)
     }
 
-    getActiveTimer(userId: string, guildId: string): Timer {
-        return this.timerRepository.getTimers(userId, guildId).find(timer => !timer.isComplete)
+    async getActiveTimer(userId: string, guildId: string): Promise<Timer> {
+        const timers = await this.timerRepository.getTimers(userId, guildId)
+        return timers.find(timer => timer.isComplete === false)
     }
 
-    getTimers(userId: string, guildId): Timer[] {
+    async getTimers(userId: string, guildId): Promise<Timer[]> {
         return this.timerRepository.getTimers(userId, guildId)
     }
 
-    getTimersByGuildId(guildId: string): Timer[] {
+    async getTimersByGuildId(guildId: string): Promise<Timer[]> {
         return this.timerRepository.getTimersByGuildId(guildId)
     }
 
@@ -42,5 +43,3 @@ export class TimerService {
         this.timerRepository.deleteTimerById(id)
     }
 }
-
-export const timerService = new TimerService()

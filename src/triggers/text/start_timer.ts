@@ -1,7 +1,7 @@
-import moment = require('moment-timezone')
-import { timerService } from '../../timers/timer_service'
-import type { TextTrigger } from '../../types.ts'
-import { ChannelType, VoiceChannel, type Message } from 'discord.js'
+import moment from 'moment-timezone'
+import { timerService } from '../../services'
+import type { TextTrigger } from '../../types'
+import { ChannelType, type VoiceChannel, type Message } from 'discord.js'
 
 const onInRegex = /(?:in|me|gimmi?e|need|maybe|^)\s*(?:around|a?bout|~)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
 const onAtRegex = /(?:ou?n|joining|join|can|play)\s*(?:at|around|a?bout|~)\s*(?:like)?\s*([\d:]+\s*)/i
@@ -31,8 +31,6 @@ const execOnInRegex = (message: string): moment.Moment => {
 
     let value = parseNumeric(match[1])
     const unit = match[2] || 'm'
-
-    console.log(`${match[1]}, ${match[2]}`)
 
     if (unit.startsWith('s')) {
         value = 3
@@ -65,8 +63,12 @@ const execOnAtRegex = (message: string): moment.Moment => {
 
         const date = moment().tz('America/Denver')
 
-        if (date.hour() > hourOfDay) {
-            date.hours(hourOfDay)
+        const currentHour = date.hour()
+
+        date.hour(hourOfDay)
+
+        if (currentHour % 12 > hourOfDay) {
+            date.add(12, 'hour')
         }
 
         return date.startOf('hour')
@@ -81,7 +83,7 @@ const execOnAtRegex = (message: string): moment.Moment => {
 
         date.hour(hourOfDay).minute(minuteOfHour)
 
-        if (currentHour % 12 >= hourOfDay) {
+        if (currentHour % 12 > hourOfDay) {
             date.add(12, 'hour')
         }
 
@@ -114,10 +116,10 @@ const trigger = <TextTrigger>{
             return
         }
 
-        const timer = timerService.getActiveTimer(message.author.id, message.guild.id)
+        const timer = await timerService.getActiveTimer(message.author.id, message.guild.id)
 
         if (timer) {
-            console.log('User already has an active timer in this guild')
+            console.log(`User already has an active timer in this guild ending at ${timer.endTime.format('h:mm A z')}`)
             return
         }
 
@@ -128,16 +130,16 @@ const trigger = <TextTrigger>{
             return
         }
 
-        const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members.size > 0)
+        // const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members.size > 0)
 
-        if (!userInVoiceChannel) {
-            console.log('No voice channels with members')
-            return
-        }
+        // if (!userInVoiceChannel) {
+        //     console.log('No voice channels with members')
+        //     return
+        // }
 
         console.log(`Starting timer for ${message.author.username} at ending at ${endTime}`)
 
-        timerService.createTimer(message.author.id, message.channel.id, message.guild.id, endTime)
+        await timerService.createTimer(message.author.id, message.channel.id, message.guild.id, endTime)
 
         const timeString = endTime.format('h:mm A z')
 

@@ -25,6 +25,6 @@ export type Timer = {
     guildId: string
     startTime: Moment
     endTime: Moment
-    joinTime: Moment
+    joinTime?: Moment
     isComplete: boolean
 }

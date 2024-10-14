@@ -18,7 +18,7 @@ services:
     networks:
       - timerbot
   redis:
-    image: redis
+    image: redis/redis-stack
     restart: always
     ports:
       - "6379:6379"

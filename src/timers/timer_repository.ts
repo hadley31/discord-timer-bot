@@ -1,32 +1,32 @@
-import type { Timer } from "../types.ts";
+import type { Timer } from "../types"
 
 export interface TimerRepository {
-    getTimers(userId: string, guildId: string): Timer[]
-    getTimersByGuildId(guildId: string): Timer[]
-    saveTimer(timer: Timer): Timer
-    deleteTimerById(id: number)
+    getTimers(userId: string, guildId: string): Promise<Timer[]>
+    getTimersByGuildId(guildId: string): Promise<Timer[]>
+    saveTimer(timer: Timer): Promise<Timer>
+    deleteTimerById(id: number): Promise<void>
 }
 
 export class SimpleTimerRepository implements TimerRepository {
     private timers: Timer[] = []
 
-    getTimers(userId: string, guildId: string): Timer[] {
-        return this.timers.filter(timer => timer.userId === userId && timer.guildId === guildId)
+    async getTimers(userId: string, guildId: string): Promise<Timer[]> {
+        return Promise.resolve(this.timers.filter(timer => timer.userId === userId && timer.guildId === guildId))
     }
 
-    getTimersByGuildId(guildId: string): Timer[] {
-        return this.timers.filter(timer => timer.guildId === guildId)
+    async getTimersByGuildId(guildId: string): Promise<Timer[]> {
+        return Promise.resolve(this.timers.filter(timer => timer.guildId === guildId))
     }
 
-    saveTimer(timer: Timer): Timer {
+    async saveTimer(timer: Timer): Promise<Timer> {
         if (timer.id == null) {
             timer.id = this.timers.reduce((max, timer) => timer.id > max ? timer.id : max, 0) + 1
             this.timers.push(timer)
         }
-        return timer
+        return Promise.resolve(timer)
     }
 
-    deleteTimerById(id: number) {
+    async deleteTimerById(id: number): Promise<void> {
         this.timers = this.timers.filter(timer => timer.id !== id)
     }
 }

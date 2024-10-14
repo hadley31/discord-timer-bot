@@ -1,7 +1,7 @@
-import type { VoiceTrigger } from "../../types.ts";
-import { timerService } from "../../timers/timer_service";
-import { TextChannel } from "discord.js";
-import moment = require("moment-timezone");
+import type { VoiceTrigger } from "../../types"
+import type { TextChannel } from "discord.js"
+import { timerService } from "../../services"
+import moment from "moment-timezone"
 
 
 const trigger = <VoiceTrigger>{
@@ -14,7 +14,7 @@ const trigger = <VoiceTrigger>{
         const userId = newState.member.id
         const guildId = newState.guild.id
 
-        const timer = timerService.getActiveTimer(userId, guildId)
+        const timer = await timerService.getActiveTimer(userId, guildId)
 
         return timer != null && !timer.isComplete
     },
@@ -22,11 +22,12 @@ const trigger = <VoiceTrigger>{
         const userId = newState.member.id
         const guildId = newState.guild.id
 
-        const timer = timerService.getActiveTimer(userId, guildId)
+        let timer = await timerService.getActiveTimer(userId, guildId)
+
         timer.joinTime = moment()
         timer.isComplete = true
 
-        timerService.saveTimer(timer)
+        timer = await timerService.saveTimer(timer)
 
         const channel = await newState.client.channels.fetch(timer.channelId) as TextChannel
 

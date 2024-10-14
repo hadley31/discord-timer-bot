@@ -1,7 +1,6 @@
-// Require the necessary discord.js classes
-import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { Client, Events, GatewayIntentBits } from 'discord.js'
 
-const { DISCORD_TOKEN } = process.env;
+const { DISCORD_TOKEN } = process.env
 
 const client = new Client({
     intents: [
@@ -11,18 +10,18 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildVoiceStates,
     ]
-});
+})
 
 import { textTriggers, voiceTriggers } from './triggers'
 import { commands } from './commands'
 
 client.once(Events.ClientReady, readyClient => {
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+    console.log(`Ready! Logged in as ${readyClient.user.tag}`)
+})
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isCommand()) {
-        return;
+        return
     }
 
     for (const command of commands) {
@@ -53,4 +52,4 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     }
 })
 
-client.login(DISCORD_TOKEN);
+client.login(DISCORD_TOKEN)

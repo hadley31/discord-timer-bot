@@ -7,6 +7,9 @@
     },
     "dependencies": {
         "discord.js": "^14.16.3",
-        "moment-timezone": "^0.5.46"
-    }
+        "moment-timezone": "^0.5.46",
+        "redis": "^4.7.0",
+        "redis-om": "^0.4.6"
+    },
+    "module": "es2022"
 }

@@ -11,4 +11,4 @@ COPY src ./src
 
 USER bun
 
-ENTRYPOINT ["bun", "run", "start"]
+CMD ["bun", "run", "start"]
