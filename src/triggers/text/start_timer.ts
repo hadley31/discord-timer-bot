@@ -1,7 +1,7 @@
 import moment from 'moment-timezone'
 import { timerService } from '../../services'
 import type { TextTrigger } from '../../types'
-import type { Message } from 'discord.js'
+import { ChannelType, type VoiceChannel, type Message } from 'discord.js'
 
 const onInRegex = /(?:in|me|gimmi?e|need|maybe|^)\s*(?:around|a?bout|~)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
 const onAtRegex = /(?:ou?n|joining|join|can|play)\s*(?:at|around|a?bout|~)\s*(?:like)?\s*([\d:]+\s*)/i
@@ -130,12 +130,12 @@ const trigger = <TextTrigger>{
             return
         }
 
-        // const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members.size > 0)
+        const userInVoiceChannel = message.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).some(channel => (channel as VoiceChannel).members.size > 0)
 
-        // if (!userInVoiceChannel) {
-        //     console.log('No voice channels with members')
-        //     return
-        // }
+        if (!userInVoiceChannel) {
+            console.log('No voice channels with members')
+            return
+        }
 
         console.log(`Starting timer for ${message.author.username} at ending at ${endTime}`)
 
