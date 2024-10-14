@@ -6,6 +6,7 @@
         "start:docker": "docker compose -f compose.yaml up timerbot"
     },
     "dependencies": {
-        "discord.js": "^14.16.3"
+        "discord.js": "^14.16.3",
+        "moment-timezone": "^0.5.46"
     }
 }

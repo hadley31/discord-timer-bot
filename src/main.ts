@@ -33,7 +33,7 @@ client.on(Events.InteractionCreate, async interaction => {
 })
 
 client.on(Events.MessageCreate, async message => {
-    console.log(message.toString())
+    console.log(`${message.author.username} (${message.author.id}) says: ${message.toString()}`)
     if (message.author.bot) {
         return
     }

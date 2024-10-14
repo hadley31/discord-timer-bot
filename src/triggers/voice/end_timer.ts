@@ -1,6 +1,7 @@
 import type { VoiceTrigger } from "../../types.ts";
 import { timerService } from "../../timers/timer_service";
 import { TextChannel } from "discord.js";
+import moment = require("moment-timezone");
 
 
 const trigger = <VoiceTrigger>{
@@ -13,7 +14,7 @@ const trigger = <VoiceTrigger>{
         const userId = newState.member.id
         const guildId = newState.guild.id
 
-        const timer = timerService.getTimer(userId, guildId)
+        const timer = timerService.getActiveTimer(userId, guildId)
 
         return timer != null && !timer.isComplete
     },
@@ -21,15 +22,15 @@ const trigger = <VoiceTrigger>{
         const userId = newState.member.id
         const guildId = newState.guild.id
 
-        const timer = timerService.getTimer(userId, guildId)
-        timer.joinTime = new Date()
+        const timer = timerService.getActiveTimer(userId, guildId)
+        timer.joinTime = moment()
         timer.isComplete = true
 
         timerService.saveTimer(timer)
 
         const channel = await newState.client.channels.fetch(timer.channelId) as TextChannel
 
-        const deltaSeconds = (timer.endTime.getTime() - timer.joinTime.getTime()) / 1000
+        const deltaSeconds = timer.endTime.diff(timer.joinTime, 'seconds')
         let value = Math.floor(Math.abs(deltaSeconds))
         let unit = 'seconds'
 

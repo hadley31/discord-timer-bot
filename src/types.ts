@@ -1,4 +1,5 @@
 import { CommandInteraction, Message, SlashCommandBuilder, VoiceState } from "discord.js"
+import { Moment } from 'moment'
 
 export type Command = {
     data: SlashCommandBuilder
@@ -22,8 +23,8 @@ export type Timer = {
     userId: string
     channelId: string
     guildId: string
-    startTime: Date
-    endTime: Date
-    joinTime: Date
+    startTime: Moment
+    endTime: Moment
+    joinTime: Moment
     isComplete: boolean
 }

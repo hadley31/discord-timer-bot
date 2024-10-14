@@ -1,9 +1,10 @@
+import moment = require('moment-timezone')
 import { timerService } from '../../timers/timer_service'
 import type { TextTrigger } from '../../types.ts'
 import { ChannelType, VoiceChannel, type Message } from 'discord.js'
 
-const onInRegex = /(?:in|me|gimmie|need|^)\s*(?:like|around|a?bout|~)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h)?/i
-const onAtRegex = /(?:ou?n|joining|join)\s*(?:at|around|a?bout|~)\s*([\d:]+\s*)/i
+const onInRegex = /(?:in|me|gimmi?e|need|^)\s*(?:around|a?bout|~)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
+const onAtRegex = /(?:ou?n|joining|join|can|play)\s*(?:at|around|a?bout|~)\s*(?:like)?\s*([\d:]+\s*)/i
 
 const regexes = [onInRegex, onAtRegex]
 
@@ -21,26 +22,29 @@ const parseNumeric = (text: string) => {
 }
 
 
-const execOnInRegex = (message: string): Date => {
+const execOnInRegex = (message: string): moment.Moment => {
     const match = onInRegex.exec(message)
 
     if (!match) {
         return
     }
 
-    let minutes = parseNumeric(match[1])
+    let value = parseNumeric(match[1])
     const unit = match[2] || 'm'
 
     console.log(`${match[1]}, ${match[2]}`)
 
+    if (unit.startsWith('s')) {
+        value = 3
+    }
     if (unit.startsWith('h')) {
-        minutes *= 60
+        value *= 60
     }
 
-    return new Date(Date.now() + minutes * 60 * 1000)
+    return moment().tz('America/Denver').add(value, 'minute').startOf('minute')
 }
 
-const execOnAtRegex = (message: string): Date => {
+const execOnAtRegex = (message: string): moment.Moment => {
     const match = onAtRegex.exec(message)
 
     if (!match) {
@@ -50,25 +54,44 @@ const execOnAtRegex = (message: string): Date => {
     const time = match[1]
 
     if (time.includes(':')) {
-        const [hours, minutes] = time.split(':').map(n => parseInt(n))
+        const [hourOfDay, minuteOfHour] = time.split(':').map(n => parseInt(n))
 
-        const date = new Date()
-        date.setHours(hours, minutes, 0, 0)
+        const date = moment().tz('America/Denver')
+        date.hour(hourOfDay).minute(minuteOfHour)
 
-        return date
+        return date.startOf('minute')
+    } else if (time.length <= 2) {
+        const hourOfDay = parseInt(time)
+
+        const date = moment().tz('America/Denver')
+
+        if (date.hour() > hourOfDay) {
+            date.hours(hourOfDay)
+        }
+
+        return date.startOf('hour')
     } else {
-        const hours = parseInt(time)
+        let hourOfDay = parseInt(time.slice(0, -2))
+        const minuteOfHour = parseInt(time.slice(-2))
 
-        const date = new Date()
-        date.setHours(hours, 0, 0, 0)
+        const date = moment()
+            .tz('America/Denver')
 
-        return date
+        const currentHour = date.hour()
+
+        date.hour(hourOfDay).minute(minuteOfHour)
+
+        if (currentHour % 12 >= hourOfDay) {
+            date.add(12, 'hour')
+        }
+
+        return date.startOf('minute')
     }
 }
 
 const regexExecs = [execOnInRegex, execOnAtRegex]
 
-const calculateJoinTime = (message: string): Date => {
+const calculateJoinTime = (message: string): moment.Moment => {
     for (const execRegex of regexExecs) {
         const time = execRegex(message)
 
@@ -91,10 +114,10 @@ const trigger = <TextTrigger>{
             return
         }
 
-        const timer = timerService.getTimer(message.author.id, message.guild.id)
+        const timer = timerService.getActiveTimer(message.author.id, message.guild.id)
 
         if (timer) {
-            console.log('User already has a timer')
+            console.log('User already has an active timer in this guild')
             return
         }
 
@@ -116,12 +139,7 @@ const trigger = <TextTrigger>{
 
         timerService.createTimer(message.author.id, message.channel.id, message.guild.id, endTime)
 
-        const timeString = endTime.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            timeZone: 'America/Denver',
-            timeZoneName: 'shortGeneric'
-        })
+        const timeString = endTime.format('h:mm A z')
 
         message.reply(`A timer has been started. Join the voice channel by **${timeString}** to avoid public shaming.`)
     }

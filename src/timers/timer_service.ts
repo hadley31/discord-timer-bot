@@ -1,3 +1,4 @@
+import moment = require("moment-timezone")
 import type { Timer } from "../types.ts"
 import { SimpleTimerRepository, TimerRepository } from "./timer_repository"
 
@@ -8,12 +9,12 @@ export class TimerService {
         this.timerRepository = timerRepository
     }
 
-    createTimer(userId: string, channelId: string, guildId: string, expiration: Date): Timer {
+    createTimer(userId: string, channelId: string, guildId: string, expiration: moment.Moment): Timer {
         const timer = <Timer>{
             userId,
             channelId,
             guildId,
-            startTime: new Date(),
+            startTime: moment(),
             endTime: expiration,
             isComplete: false
         }
@@ -25,12 +26,20 @@ export class TimerService {
         return this.timerRepository.saveTimer(timer)
     }
 
-    getTimer(userId: string, guildId: string): Timer {
-        return this.timerRepository.getTimer(userId, guildId)
+    getActiveTimer(userId: string, guildId: string): Timer {
+        return this.timerRepository.getTimers(userId, guildId).find(timer => !timer.isComplete)
+    }
+
+    getTimers(userId: string, guildId): Timer[] {
+        return this.timerRepository.getTimers(userId, guildId)
     }
 
     getTimersByGuildId(guildId: string): Timer[] {
         return this.timerRepository.getTimersByGuildId(guildId)
+    }
+
+    deleteTimerById(id: number) {
+        this.timerRepository.deleteTimerById(id)
     }
 }
 

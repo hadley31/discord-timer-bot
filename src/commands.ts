@@ -21,7 +21,7 @@ export const deployCommands = async () => {
         const data = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             { body: deployCommandsBody },
-        );
+        ) as any[];
 
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (error) {
