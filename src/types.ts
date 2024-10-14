@@ -1,9 +1,9 @@
-import { CommandInteraction, Message, SlashCommandBuilder, VoiceState } from "discord.js"
+import { ChatInputCommandInteraction, Message, SlashCommandBuilder, VoiceState } from "discord.js"
 import { Moment } from 'moment'
 
 export type Command = {
     data: SlashCommandBuilder
-    execute: (interaction: CommandInteraction) => Promise<void>
+    execute: (interaction: ChatInputCommandInteraction) => Promise<void>
 }
 
 export type TextTrigger = {
