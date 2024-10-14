@@ -21,6 +21,6 @@ services:
     image: redis/redis-stack
     restart: always
     ports:
-      - "6379:6379"
+      - "${REDIS_EXPOSED_PORT:-6379}:6379"
     networks:
       - timerbot
