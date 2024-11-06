@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits } from 'discord.js'
+import { Client, Events, GatewayIntentBits, MessageReaction } from 'discord.js'
 
 const { DISCORD_TOKEN } = process.env
 
@@ -8,11 +8,12 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildVoiceStates,
     ]
 })
 
-import { textTriggers, voiceTriggers } from './triggers'
+import { textTriggers, voiceTriggers, reactionTriggers } from './triggers'
 import { commands } from './commands'
 
 client.once(Events.ClientReady, readyClient => {
@@ -20,7 +21,7 @@ client.once(Events.ClientReady, readyClient => {
 })
 
 client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isCommand()) {
+    if (!interaction.isChatInputCommand()) {
         return
     }
 
@@ -31,11 +32,24 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 })
 
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+    if (user.bot) {
+        return
+    }
+
+    for (const trigger of reactionTriggers) {
+        if (await trigger.test(reaction, user)) {
+            await trigger.execute(reaction, user)
+        }
+    }
+})
+
 client.on(Events.MessageCreate, async message => {
-    console.log(`${message.author.username} (${message.author.id}) says: ${message.toString()}`)
     if (message.author.bot) {
         return
     }
+
+    console.log(`${message.author.username} (${message.author.id}) says: ${message.toString()}`)
 
     for (const trigger of textTriggers) {
         if (await trigger.test(message)) {
@@ -45,6 +59,14 @@ client.on(Events.MessageCreate, async message => {
 })
 
 client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+    if (oldState.member.user.bot) {
+        return
+    }
+
+    if (!oldState.channelId && newState.channelId) {
+        console.log(`${oldState.member.user.username} (${oldState.member.user.id}) joined voice channel: ${newState.channel.name}`)
+    }
+
     for (const trigger of voiceTriggers) {
         if (await trigger.test(oldState, newState)) {
             await trigger.execute(oldState, newState)

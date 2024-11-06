@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Message, SlashCommandBuilder, VoiceState } from "discord.js"
+import type { ChatInputCommandInteraction, Message, MessageReaction, PartialMessageReaction, PartialUser, SlashCommandBuilder, User, VoiceState } from "discord.js"
 import { Moment } from 'moment'
 
 export type Command = {
@@ -16,6 +16,12 @@ export type VoiceTrigger = {
     name: string
     test: (oldState: VoiceState, newState: VoiceState) => Promise<boolean>
     execute: (oldState: VoiceState, newState: VoiceState) => Promise<void>
+}
+
+export type ReactionTrigger = {
+    name: string
+    test: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<boolean>
+    execute: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<void>
 }
 
 export type Timer = {

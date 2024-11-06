@@ -16,7 +16,7 @@ const trigger = <VoiceTrigger>{
 
         const timer = await timerService.getActiveTimer(userId, guildId)
 
-        return timer != null && !timer.isComplete
+        return timer != null && !timer.isComplete && timer.guildId === newState.guild.id
     },
     execute: async (oldState, newState) => {
         const userId = newState.member.id
