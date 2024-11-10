@@ -23,9 +23,13 @@ const trigger = <ReactionTrigger>{
             return
         }
 
-        const timerEndTimeFunc = reaction.emoji.name === '⏲️' ? parseOnInTime : parseOnAtTime
+        const initialTimestamp = moment.unix(reaction.message.createdTimestamp).tz('America/Denver')
 
-        const endTime = timerEndTimeFunc(reaction.message.content)
+        const messageContent = reaction.message.content
+
+        const endTime = reaction.emoji.name === '⏲️'
+            ? parseOnInTime(messageContent, { initialTimestamp })
+            : parseOnAtTime(messageContent)
 
         if (endTime == null) {
             console.error('Error while parsing time')

@@ -6,6 +6,11 @@ const onAtRegex = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|
 const regexes = [onInRegex, onAtRegex]
 
 
+type ParseOptions = {
+    initialTimestamp?: moment.Moment
+}
+
+
 const parseNumeric = (text: string) => {
     switch (text) {
         case 'one': return 1
@@ -19,7 +24,7 @@ const parseNumeric = (text: string) => {
 }
 
 
-export const parseOnInTime = (message: string): moment.Moment => {
+export const parseOnInTime = (message: string, options: ParseOptions = {}): moment.Moment => {
     const match = onInRegex.exec(message)
 
     if (!match) {
@@ -36,7 +41,9 @@ export const parseOnInTime = (message: string): moment.Moment => {
         value *= 60
     }
 
-    return moment().tz('America/Denver').add(value, 'minute').startOf('minute')
+    const timestamp = options.initialTimestamp || moment().tz('America/Denver')
+
+    return timestamp.add(value, 'minute').startOf('minute')
 }
 
 const createDate = (hour: number, minute: number): moment.Moment => {
@@ -78,8 +85,8 @@ export const parseOnAtTime = (message: string): moment.Moment => {
     }
 }
 
-export const calculateTimerEndTime = (message: string): moment.Moment => {
-    return parseOnInTime(message) || parseOnAtTime(message)
+export const calculateTimerEndTime = (message: string, options: ParseOptions = {}): moment.Moment => {
+    return parseOnInTime(message, options) || parseOnAtTime(message)
 }
 
 export const testRegexes = (message: string): boolean => {
