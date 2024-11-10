@@ -23,7 +23,7 @@ const trigger = <ReactionTrigger>{
             return
         }
 
-        const initialTimestamp = moment.unix(reaction.message.createdTimestamp).tz('America/Denver')
+        const initialTimestamp = moment.unix(reaction.message.createdTimestamp / 1000).tz('America/Denver')
 
         const messageContent = reaction.message.content
 
