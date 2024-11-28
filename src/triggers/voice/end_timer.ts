@@ -44,7 +44,7 @@ const trigger = <VoiceTrigger>{
 
     const message = await channel.messages.fetch(timer.messageId)
 
-    if (getJoinTimePercentage(timer) < 0.3) {
+    if (timer.endTime.diff(moment(), 'minutes') > 5 && getJoinTimePercentage(timer) < 0.3) {
       await message.reply(`<@${userId}> joined **way too early**. Shame on you!`)
       return
     }

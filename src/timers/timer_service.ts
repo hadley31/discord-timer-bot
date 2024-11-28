@@ -11,7 +11,7 @@ export class TimerService {
   }
 
   async createTimer(timer: CreateTimerRequest): Promise<Timer> {
-    const existingTimerOnMessage = this.timerRepository.getTimerByMessageId(timer.messageId)
+    const existingTimerOnMessage = await this.timerRepository.getTimerByMessageId(timer.messageId)
     if (existingTimerOnMessage) {
       throw new TimerCreationError('A timer already exists for message: ' + timer.messageId)
     }

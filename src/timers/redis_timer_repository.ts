@@ -37,7 +37,7 @@ export class RedisTimerRepository implements TimerRepository {
   private readonly redis: RedisClientType
   private readonly timerRedisRepository: Repository<RedisTimerEntity>
 
-  constructor(host, port = 6379) {
+  constructor(host: string, port = 6379) {
     this.redis = createClient({ url: `redis://${host}:${port}` })
     this.timerRedisRepository = new Repository(timerSchema, this.redis)
   }
@@ -79,6 +79,10 @@ export class RedisTimerRepository implements TimerRepository {
   }
 
   private entityToTimer(entity: RedisTimerEntity): Timer {
+    if (!entity) {
+      return null
+    }
+
     return <Timer>{
       id: entity.id,
       userId: entity.userId,
@@ -93,6 +97,10 @@ export class RedisTimerRepository implements TimerRepository {
   }
 
   private timerToEntity(timer: Timer): RedisTimerEntity {
+    if (!timer) {
+      return null
+    }
+
     return <RedisTimerEntity>{
       id: timer.id,
       userId: timer.userId,
