@@ -1,7 +1,8 @@
-import moment from "moment-timezone"
-import type { Timer } from "../types"
+import moment from 'moment-timezone'
+import type { Timer } from '../types'
 
-const onInRegexAutoDetect = /(?:getting ou?n in|joining in|i can join in|give me|gimmi?e|i('?ll)? need|i'?ll be(?: on)?(?: in)?|sure|ok(?:ay)?|^)\s*(?:around|a?bout|~)?\s*(?:maybe)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
+const onInRegexAutoDetect =
+  /(?:getting ou?n in|joining in|i can join in|give me|gimmi?e|i('?ll)? need|i'?ll be(?: on)?(?: in)?|sure|ok(?:ay)?|^)\s*(?:around|a?bout|~)?\s*(?:maybe)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
 const onAtRegexAutoDetect = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|around|~)\s*(?:maybe|a?bout)?\s*(?:like)?\s*([\d:]+\s*)/i
 
 const onInRegex = /(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
@@ -10,98 +11,102 @@ const onAtRegex = /at\s*([\d:]+)/i
 const regexes = [onInRegex, onAtRegex]
 const regexesAutoDetect = [onInRegexAutoDetect, onAtRegexAutoDetect]
 
-
 type ParseOptions = {
-    initialTimestamp?: moment.Moment
+  startTime?: moment.Moment
 }
-
 
 const parseNumeric = (text: string) => {
-    switch (text) {
-        case 'one': return 1
-        case 'two': return 2
-        case 'three': return 3
-        case 'four': return 4
-        case 'five': return 5
-        case 'ten': return 10
-        default: return parseInt(text)
-    }
+  switch (text) {
+    case 'one':
+      return 1
+    case 'two':
+      return 2
+    case 'three':
+      return 3
+    case 'four':
+      return 4
+    case 'five':
+      return 5
+    case 'ten':
+      return 10
+    default:
+      return parseInt(text)
+  }
 }
 
-
 export const parseOnInTime = (message: string, options: ParseOptions = {}): moment.Moment => {
-    const match = onInRegex.exec(message)
+  const match = onInRegex.exec(message)
 
-    if (!match) {
-        return
-    }
+  if (!match) {
+    return
+  }
 
-    let value = parseNumeric(match[1])
-    const unit = match[2] || 'm'
+  let value = parseNumeric(match[1])
+  const unit = match[2] || 'm'
 
-    if (unit.startsWith('s')) {
-        value = 3
-    }
-    if (unit.startsWith('h')) {
-        value *= 60
-    }
+  if (unit.startsWith('s')) {
+    value = 3
+  }
+  if (unit.startsWith('h')) {
+    value *= 60
+  }
 
-    const timestamp = options.initialTimestamp || moment().tz('America/Denver')
+  const timestamp = options.startTime || moment().tz('America/Denver')
 
-    return timestamp.add(value, 'minute').startOf('minute')
+  return timestamp.add(value, 'minute').startOf('minute')
 }
 
 const createDate = (hour: number, minute: number): moment.Moment => {
-    const date = moment().tz('America/Denver')
+  const date = moment().tz('America/Denver')
 
-    const currentHour = date.hour()
+  const currentHour = date.hour()
 
-    date.hour(hour).minute(minute)
+  date.hour(hour).minute(minute)
 
-    if (currentHour > hour) {
-        date.add(12, 'hour')
-    }
+  if (currentHour > hour) {
+    date.add(12, 'hour')
+  }
 
-    return date
+  return date
 }
 
 export const parseOnAtTime = (message: string): moment.Moment => {
-    const match = onAtRegex.exec(message)
+  const match = onAtRegex.exec(message)
 
-    if (!match) {
-        return null
-    }
+  if (!match) {
+    return null
+  }
 
-    const time = match[1]
+  const time = match[1]
 
-    if (time.includes(':')) {
-        const [hourOfDay, minuteOfHour] = time.split(':').map(n => parseInt(n))
+  if (time.includes(':')) {
+    const [hourOfDay, minuteOfHour] = time.split(':').map((n) => parseInt(n))
 
-        return createDate(hourOfDay, minuteOfHour).startOf('minute')
-    } else if (time.length <= 2) {
-        const hourOfDay = parseInt(time)
+    return createDate(hourOfDay, minuteOfHour).startOf('minute')
+  } else if (time.length <= 2) {
+    const hourOfDay = parseInt(time)
 
-        return createDate(hourOfDay, 0).startOf('hour')
-    } else {
-        let hourOfDay = parseInt(time.slice(0, -2))
-        const minuteOfHour = parseInt(time.slice(-2))
+    return createDate(hourOfDay, 0).startOf('hour')
+  } else {
+    let hourOfDay = parseInt(time.slice(0, -2))
+    const minuteOfHour = parseInt(time.slice(-2))
 
-        return createDate(hourOfDay, minuteOfHour).startOf('minute')
-    }
+    return createDate(hourOfDay, minuteOfHour).startOf('minute')
+  }
 }
 
 export const calculateTimerEndTime = (message: string, options: ParseOptions = {}): moment.Moment => {
-    return parseOnInTime(message, options) || parseOnAtTime(message)
+  return parseOnInTime(message, options) || parseOnAtTime(message)
 }
 
 export const autoDetectJoinEstimateMessage = (message: string): boolean => {
-    return regexesAutoDetect.some(regexes => regexes.test(message))
+  return regexesAutoDetect.some((regexes) => regexes.test(message))
 }
 
 export const detectJoinEstimateMessage = (message: string): boolean => {
-    return regexes.some(regex => regex.test(message))
+  return regexes.some((regex) => regex.test(message))
 }
 
 export const getJoinTimePercentage = (timer: Timer): number => {
-    return timer.joinTime.diff(timer.startTime, 'minutes') / timer.endTime.diff(timer.startTime, 'minutes')
+  return timer.joinTime.diff(timer.startTime, 'minutes') / timer.endTime.diff(timer.startTime, 'minutes')
 }

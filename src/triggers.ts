@@ -7,14 +7,8 @@ import endTimer from './triggers/voice/end_timer'
 // Reaction Triggers
 import challenge from './triggers/reaction/challenge'
 
-export const textTriggers = [
-    startTimer
-]
+export const textTriggers = [startTimer]
 
-export const voiceTriggers = [
-    endTimer
-]
+export const voiceTriggers = [endTimer]
 
-export const reactionTriggers = [
-    challenge
-]
+export const reactionTriggers = [challenge]

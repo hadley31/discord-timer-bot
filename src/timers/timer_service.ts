@@ -1,51 +1,64 @@
-import moment from "moment-timezone"
-import type { Timer } from "../types"
-import { TimerRepository } from "./timer_repository"
+import moment from 'moment-timezone'
+import type { CreateTimerRequest, Timer } from '../types'
+import { TimerRepository } from './timer_repository'
+import { TimerCreationError } from '../errors'
 
 export class TimerService {
-    private timerRepository: TimerRepository
+  private timerRepository: TimerRepository
 
-    constructor(timerRepository: TimerRepository) {
-        this.timerRepository = timerRepository
+  constructor(timerRepository: TimerRepository) {
+    this.timerRepository = timerRepository
+  }
+
+  async createTimer(timer: CreateTimerRequest): Promise<Timer> {
+    const existingTimerOnMessage = this.timerRepository.getTimerByMessageId(timer.messageId)
+    if (existingTimerOnMessage) {
+      throw new TimerCreationError('A timer already exists for message: ' + timer.messageId)
     }
 
-    async createTimer(userId: string, channelId: string, guildId: string, messageId: string, expiration: moment.Moment): Promise<Timer> {
-        const timer = <Timer>{
-            userId,
-            channelId,
-            guildId,
-            messageId,
-            startTime: moment(),
-            endTime: expiration,
-            isComplete: false
-        }
-
-        return this.timerRepository.saveTimer(timer)
+    const existingActiveTimer = await this.getActiveTimerByUserId(timer.userId, timer.guildId)
+    if (existingActiveTimer) {
+      throw new TimerCreationError('A timer is already active for user: ' + timer.userId + ' in guild: ' + timer.guildId)
     }
 
-    async saveTimer(timer: Timer): Promise<Timer> {
-        return this.timerRepository.saveTimer(timer)
+    const now = moment().tz('America/Denver')
+
+    if (timer.endTime.isBefore(now)) {
+      throw new TimerCreationError('Expiration time is in the past')
     }
 
-    async getActiveTimerByUserId(userId: string, guildId: string): Promise<Timer> {
-        const timers = await this.timerRepository.getTimers(userId, guildId)
-        return timers.find(timer => timer.isComplete === false)
+    const newTimer = <Timer>{
+      ...timer,
+      joinTime: null,
+      isComplete: false,
     }
 
-    async getAllTimersByUserId(userId: string, guildId): Promise<Timer[]> {
-        return this.timerRepository.getTimers(userId, guildId)
-    }
+    return this.timerRepository.saveTimer(newTimer)
+  }
 
-    async getCompleteTimersByUserId(userId: string, guildId: string): Promise<Timer[]> {
-        const timers = await this.getAllTimersByUserId(userId, guildId)
-        return timers.filter(t => t.isComplete === true && t.joinTime)
-    }
+  async saveTimer(timer: Timer): Promise<Timer> {
+    return this.timerRepository.saveTimer(timer)
+  }
 
-    async getTimersByGuildId(guildId: string): Promise<Timer[]> {
-        return this.timerRepository.getTimersByGuildId(guildId)
-    }
+  async getActiveTimerByUserId(userId: string, guildId: string): Promise<Timer> {
+    const timers = await this.timerRepository.getTimers(userId, guildId)
+    return timers.find((timer) => timer.isComplete === false)
+  }
 
-    deleteTimerById(id: number) {
-        this.timerRepository.deleteTimerById(id)
-    }
+  async getAllTimersByUserId(userId: string, guildId): Promise<Timer[]> {
+    return this.timerRepository.getTimers(userId, guildId)
+  }
+
+  async getCompleteTimersByUserId(userId: string, guildId: string): Promise<Timer[]> {
+    const timers = await this.getAllTimersByUserId(userId, guildId)
+    return timers.filter((t) => t.isComplete === true && t.joinTime)
+  }
+
+  async getTimersByGuildId(guildId: string): Promise<Timer[]> {
+    return this.timerRepository.getTimersByGuildId(guildId)
+  }
+
+  deleteTimerById(id: number) {
+    this.timerRepository.deleteTimerById(id)
+  }
 }
