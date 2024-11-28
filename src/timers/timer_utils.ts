@@ -1,9 +1,14 @@
 import moment from "moment-timezone"
+import type { Timer } from "../types"
 
-const onInRegex = /(?:getting ou?n in|joining in|give me|gimmi?e|i need|i'?ll be|^)\s*(?:around|a?bout|~)?\s*(?:maybe)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
-const onAtRegex = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|around|a?bout|~)\s*(?:maybe)?\s*(?:like)?\s*([\d:]+\s*)/i
+const onInRegexAutoDetect = /(?:getting ou?n in|joining in|i can join in|give me|gimmi?e|i('?ll)? need|i'?ll be(?: on)?(?: in)?|sure|ok(?:ay)?|^)\s*(?:around|a?bout|~)?\s*(?:maybe)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
+const onAtRegexAutoDetect = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|around|~)\s*(?:maybe|a?bout)?\s*(?:like)?\s*([\d:]+\s*)/i
+
+const onInRegex = /(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
+const onAtRegex = /at\s*([\d:]+)/i
 
 const regexes = [onInRegex, onAtRegex]
+const regexesAutoDetect = [onInRegexAutoDetect, onAtRegexAutoDetect]
 
 
 type ParseOptions = {
@@ -89,6 +94,14 @@ export const calculateTimerEndTime = (message: string, options: ParseOptions = {
     return parseOnInTime(message, options) || parseOnAtTime(message)
 }
 
-export const testRegexes = (message: string): boolean => {
+export const autoDetectJoinEstimateMessage = (message: string): boolean => {
+    return regexesAutoDetect.some(regexes => regexes.test(message))
+}
+
+export const detectJoinEstimateMessage = (message: string): boolean => {
     return regexes.some(regex => regex.test(message))
+}
+
+export const getJoinTimePercentage = (timer: Timer): number => {
+    return timer.joinTime.diff(timer.startTime, 'minutes') / timer.endTime.diff(timer.startTime, 'minutes')
 }

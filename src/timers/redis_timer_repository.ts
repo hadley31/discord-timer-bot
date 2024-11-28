@@ -9,6 +9,7 @@ type RedisTimerEntity = {
     userId: string
     channelId: string
     guildId: string
+    messageId: string
     startTime: Date
     endTime: Date
     joinTime?: Date
@@ -20,11 +21,16 @@ const timerSchema = new Schema<RedisTimerEntity>('timer', {
     userId: { type: 'string' },
     channelId: { type: 'string' },
     guildId: { type: 'string' },
+    messageId: { type: 'string' },
     startTime: { type: 'date' },
     endTime: { type: 'date' },
     joinTime: { type: 'date' },
     isComplete: { type: 'boolean' }
 })
+
+const TIMER_ID = 'timerId'
+const USER_ID = 'userId'
+const GUILD_ID = 'guildId'
 
 export class RedisTimerRepository implements TimerRepository {
     private readonly redis: RedisClientType
@@ -41,12 +47,12 @@ export class RedisTimerRepository implements TimerRepository {
     }
 
     async getTimers(userId: string, guildId: string): Promise<Timer[]> {
-        const timerEntities = await this.timerRedisRepository.search().where('userId').eq(userId).and('guildId').eq(guildId).return.all()
+        const timerEntities = await this.timerRedisRepository.search().where(USER_ID).eq(userId).and(GUILD_ID).eq(guildId).return.all()
         return timerEntities.map(this.entityToTimer)
     }
 
     async getTimersByGuildId(guildId: string): Promise<Timer[]> {
-        const timerEntities = await this.timerRedisRepository.search().where('guildId').eq(guildId).return.all()
+        const timerEntities = await this.timerRedisRepository.search().where(GUILD_ID).eq(guildId).return.all()
         return timerEntities.map(this.entityToTimer)
     }
 
@@ -54,7 +60,7 @@ export class RedisTimerRepository implements TimerRepository {
         const timerEntity = this.timerToEntity(timer)
 
         if (!timerEntity.id) {
-            timerEntity.id = await this.redis.incr('timer_id')
+            timerEntity.id = await this.redis.incr(TIMER_ID)
         }
 
         const entity = await this.timerRedisRepository.save(timerEntity.id.toString(), timerEntity)
@@ -72,6 +78,7 @@ export class RedisTimerRepository implements TimerRepository {
             userId: entity.userId,
             channelId: entity.channelId,
             guildId: entity.guildId,
+            messageId: entity.messageId,
             startTime: moment(entity.startTime),
             endTime: moment(entity.endTime),
             joinTime: entity.joinTime ? moment(entity.joinTime) : null,
@@ -85,6 +92,7 @@ export class RedisTimerRepository implements TimerRepository {
             userId: timer.userId,
             channelId: timer.channelId,
             guildId: timer.guildId,
+            messageId: timer.messageId,
             startTime: timer.startTime.toDate(),
             endTime: timer.endTime.toDate(),
             joinTime: timer.joinTime?.toDate(),

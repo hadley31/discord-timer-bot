@@ -2,6 +2,7 @@ import type { VoiceTrigger } from "../../types"
 import type { TextChannel } from "discord.js"
 import { timerService } from "../../services"
 import moment from "moment-timezone"
+import { getJoinTimePercentage } from "../../timers/timer_utils"
 
 
 const trigger = <VoiceTrigger>{
@@ -14,7 +15,7 @@ const trigger = <VoiceTrigger>{
         const userId = newState.member.id
         const guildId = newState.guild.id
 
-        const timer = await timerService.getActiveTimer(userId, guildId)
+        const timer = await timerService.getActiveTimerByUserId(userId, guildId)
 
         return timer != null && !timer.isComplete && timer.guildId === newState.guild.id
     },
@@ -22,7 +23,7 @@ const trigger = <VoiceTrigger>{
         const userId = newState.member.id
         const guildId = newState.guild.id
 
-        let timer = await timerService.getActiveTimer(userId, guildId)
+        let timer = await timerService.getActiveTimerByUserId(userId, guildId)
 
         timer.joinTime = moment()
         timer.isComplete = true
@@ -42,7 +43,14 @@ const trigger = <VoiceTrigger>{
 
         const earlyOrLate = deltaSeconds > 0 ? 'early' : 'late'
 
-        channel.send(`<@${userId}> joined ${value} ${unit} **${earlyOrLate}**`)
+        const message = await channel.messages.fetch(timer.messageId)
+
+        if (getJoinTimePercentage(timer) < 0.3) {
+            await message.reply(`<@${userId}> joined **way too early**. Shame on you!`)
+            return
+        }
+
+        await message.reply(`<@${userId}> joined ${value} ${unit} **${earlyOrLate}**`)
     }
 }
 

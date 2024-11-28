@@ -1,15 +1,23 @@
 {
-    "scripts": {
-        "dev": "bun --watch src/main.ts",
-        "dev:docker": "docker compose -f compose-dev.yaml up timerbot --force-recreate --remove-orphans",
-        "start": "bun src/main.ts",
-        "start:docker": "docker compose -f compose.yaml up timerbot"
-    },
-    "dependencies": {
-        "discord.js": "^14.16.3",
-        "moment-timezone": "^0.5.46",
-        "redis": "^4.7.0",
-        "redis-om": "^0.4.6"
-    },
-    "module": "es2022"
+  "name": "timer-bot",
+  "scripts": {
+    "dev": "bun --watch src/main.ts",
+    "dev:docker": "docker compose -f compose-dev.yaml up timerbot --force-recreate --remove-orphans",
+    "start": "bun src/main.ts",
+    "start:docker": "docker compose -f compose.yaml up timerbot"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "moment-timezone": "^0.5.46",
+    "redis": "^4.7.0",
+    "redis-om": "^0.4.6"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "module": "src/main.ts",
+  "type": "module"
 }

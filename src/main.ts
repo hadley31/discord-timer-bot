@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, MessageReaction } from 'discord.js'
+import { Client, Events, GatewayIntentBits } from 'discord.js'
 
 const { DISCORD_TOKEN } = process.env
 

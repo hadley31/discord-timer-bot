@@ -9,11 +9,12 @@ export class TimerService {
         this.timerRepository = timerRepository
     }
 
-    async createTimer(userId: string, channelId: string, guildId: string, expiration: moment.Moment): Promise<Timer> {
+    async createTimer(userId: string, channelId: string, guildId: string, messageId: string, expiration: moment.Moment): Promise<Timer> {
         const timer = <Timer>{
             userId,
             channelId,
             guildId,
+            messageId,
             startTime: moment(),
             endTime: expiration,
             isComplete: false
@@ -26,13 +27,18 @@ export class TimerService {
         return this.timerRepository.saveTimer(timer)
     }
 
-    async getActiveTimer(userId: string, guildId: string): Promise<Timer> {
+    async getActiveTimerByUserId(userId: string, guildId: string): Promise<Timer> {
         const timers = await this.timerRepository.getTimers(userId, guildId)
         return timers.find(timer => timer.isComplete === false)
     }
 
-    async getTimers(userId: string, guildId): Promise<Timer[]> {
+    async getAllTimersByUserId(userId: string, guildId): Promise<Timer[]> {
         return this.timerRepository.getTimers(userId, guildId)
+    }
+
+    async getCompleteTimersByUserId(userId: string, guildId: string): Promise<Timer[]> {
+        const timers = await this.getAllTimersByUserId(userId, guildId)
+        return timers.filter(t => t.isComplete === true && t.joinTime)
     }
 
     async getTimersByGuildId(guildId: string): Promise<Timer[]> {

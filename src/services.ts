@@ -1,3 +1,4 @@
+import { TimerStatsService } from "./stats/timer_stats_service"
 import { RedisTimerRepository } from "./timers/redis_timer_repository"
 import { SimpleTimerRepository } from "./timers/timer_repository"
 import { TimerService } from "./timers/timer_service"
@@ -17,3 +18,5 @@ async function getTimerRepository() {
 const timerRepository = await getTimerRepository()
 
 export const timerService = new TimerService(timerRepository)
+
+export const timerStatsService = new TimerStatsService(timerService);

@@ -29,6 +29,7 @@ export type Timer = {
     userId: string
     channelId: string
     guildId: string
+    messageId: string
     startTime: Moment
     endTime: Moment
     joinTime?: Moment
