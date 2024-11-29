@@ -52,18 +52,18 @@ const command = <Command>{
 
     const voiceMembers = voiceChannel.members?.filter((member) => !member.user.bot)
 
-    const randomMembers = voiceMembers.random(5)
-
     const useWeb = interaction.options.getBoolean('web')
 
     if (useWeb) {
       const url = await generateWheel(
         interaction.guild.name,
-        randomMembers.map((m) => m.displayName),
+        voiceMembers.map((m) => m.displayName),
       )
       interaction.reply('Generated new wheel of names: ' + url)
       return
     }
+
+    const randomMembers = voiceMembers.random(5)
 
     interaction.reply(`**Players for the next match:**\n${randomMembers.map((member, index) => `${index + 1}. ${member.toString()}`).join('\n')}`)
   },
