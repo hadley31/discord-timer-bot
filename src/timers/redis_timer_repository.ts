@@ -1,11 +1,10 @@
 import moment from 'moment-timezone'
 import { createClient, RedisClientType } from 'redis'
-import { Repository, Schema } from 'redis-om'
+import { Repository, Schema, EntityId } from 'redis-om'
 import type { Timer } from '../types'
 import type { TimerRepository } from './timer_repository'
 
 type RedisTimerEntity = {
-  id: number
   userId: string
   channelId: string
   guildId: string
@@ -17,7 +16,6 @@ type RedisTimerEntity = {
 }
 
 const timerSchema = new Schema<RedisTimerEntity>('timer', {
-  id: { type: 'number' },
   userId: { type: 'string' },
   channelId: { type: 'string' },
   guildId: { type: 'string' },
@@ -28,7 +26,6 @@ const timerSchema = new Schema<RedisTimerEntity>('timer', {
   isComplete: { type: 'boolean' },
 })
 
-const TIMER_ID = 'timerId'
 const USER_ID = 'userId'
 const GUILD_ID = 'guildId'
 const MESSAGE_ID = 'messageId'
@@ -65,17 +62,13 @@ export class RedisTimerRepository implements TimerRepository {
   async saveTimer(timer: Timer): Promise<Timer> {
     const timerEntity = this.timerToEntity(timer)
 
-    if (!timerEntity.id) {
-      timerEntity.id = await this.redis.incr(TIMER_ID)
-    }
-
-    const entity = await this.timerRedisRepository.save(timerEntity.id.toString(), timerEntity)
+    const entity = await this.timerRedisRepository.save(timerEntity)
 
     return this.entityToTimer(entity)
   }
 
-  async deleteTimerById(id: number): Promise<void> {
-    // await this.timerRedisRepository.remove(id)
+  async deleteTimerById(id: string): Promise<void> {
+    await this.timerRedisRepository.remove(id)
   }
 
   private entityToTimer(entity: RedisTimerEntity): Timer {
@@ -84,7 +77,7 @@ export class RedisTimerRepository implements TimerRepository {
     }
 
     return <Timer>{
-      id: entity.id,
+      id: entity[EntityId],
       userId: entity.userId,
       channelId: entity.channelId,
       guildId: entity.guildId,
@@ -102,7 +95,6 @@ export class RedisTimerRepository implements TimerRepository {
     }
 
     return <RedisTimerEntity>{
-      id: timer.id,
       userId: timer.userId,
       channelId: timer.channelId,
       guildId: timer.guildId,

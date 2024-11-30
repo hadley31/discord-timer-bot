@@ -34,7 +34,7 @@ export type ReactionTrigger = {
 }
 
 export type Timer = {
-  id: number
+  id: string
   userId: string
   channelId: string
   guildId: string
