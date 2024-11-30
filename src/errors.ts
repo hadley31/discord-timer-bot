@@ -19,7 +19,7 @@ export class TimerNotFoundError extends TimerBotError {
 }
 
 export class TimerAlreadyExistsError extends TimerCreationError {
-  private timer: Timer
+  public readonly timer: Timer
 
   constructor(timer: Timer) {
     super('A timer already exists for user: ' + timer.userId + ' in guild: ' + timer.guildId)
