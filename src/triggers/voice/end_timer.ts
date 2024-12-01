@@ -2,7 +2,7 @@ import type { VoiceTrigger } from '../../types'
 import type { TextChannel } from 'discord.js'
 import { timerService } from '../../services'
 import moment from 'moment-timezone'
-import { getJoinTimePercentage } from '../../timers/timer_utils'
+import { getJoinTimePercentage } from '../../util/timer_utils'
 
 const trigger = <VoiceTrigger>{
   name: 'End Timer',

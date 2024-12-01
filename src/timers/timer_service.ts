@@ -21,7 +21,7 @@ export class TimerService {
       throw new TimerCreationError('A timer is already active for user: ' + timer.userId + ' in guild: ' + timer.guildId)
     }
 
-    const now = moment().tz('America/Denver')
+    const now = moment()
 
     if (timer.endTime.isBefore(now)) {
       throw new TimerCreationError('Expiration time is in the past')

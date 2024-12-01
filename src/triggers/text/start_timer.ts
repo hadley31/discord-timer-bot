@@ -1,8 +1,9 @@
 import { timerService } from '../../services'
 import type { TextTrigger } from '../../types'
 import { ChannelType, type VoiceChannel, type Message } from 'discord.js'
-import { calculateTimerEndTime, autoDetectJoinEstimateMessage } from '../../timers/timer_utils'
+import { calculateTimerEndTime, autoDetectJoinEstimateMessage } from '../../util/timer_utils'
 import moment from 'moment-timezone'
+import { formatWithTimezone } from '../../util/discord_utils'
 
 const trigger = <TextTrigger>{
   name: 'Start Timer',
@@ -18,7 +19,7 @@ const trigger = <TextTrigger>{
     const timer = await timerService.getActiveTimerByUserId(message.author.id, message.guild.id)
 
     if (timer) {
-      console.log(`User already has an active timer in this guild ending at ${timer.endTime.format('h:mm A z')}`)
+      console.log(`User already has an active timer in this guild ending at ${formatWithTimezone(timer.endTime)}`)
       return
     }
 
@@ -44,7 +45,7 @@ const trigger = <TextTrigger>{
     const channelId = message.channel.id
     const messageId = message.id
     const guildId = message.guild.id
-    const startTime = moment.unix(message.createdTimestamp / 1000).tz('America/Denver')
+    const startTime = moment(message.createdAt)
 
     await timerService.createTimer({
       userId,

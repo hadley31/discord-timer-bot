@@ -1,8 +1,9 @@
 import type { ReactionTrigger } from '../../types'
 import { timerService, timerStatsService } from '../../services'
 import moment from 'moment-timezone'
-import { parseOnAtTime, parseOnInTime } from '../../timers/timer_utils'
+import { parseOnAtTime, parseOnInTime } from '../../util/timer_utils'
 import { TimerAlreadyExistsError, TimerCreationError } from '../../errors'
+import { formatWithTimezone } from '../../util/discord_utils'
 
 const trigger = <ReactionTrigger>{
   name: 'Challenge Timer',
@@ -25,7 +26,7 @@ const trigger = <ReactionTrigger>{
       throw new TimerAlreadyExistsError(timer)
     }
 
-    const startTime = moment.unix(reaction.message.createdTimestamp / 1000).tz('America/Denver')
+    const startTime = moment(reaction.message.createdAt)
 
     const messageContent = reaction.message.content
 
@@ -46,11 +47,11 @@ const trigger = <ReactionTrigger>{
       endTime,
     })
 
-    const timeString = endTime.format('h:mm A z')
+    const timeString = formatWithTimezone(endTime)
 
     const expectedJoinTime = await timerStatsService.getExpectedJoinTime(newTimer)
 
-    const expectedJoinTimeString = expectedJoinTime.tz('America/Denver').format('h:mm A z')
+    const expectedJoinTimeString = formatWithTimezone(expectedJoinTime)
 
     reaction.message.reply(
       `${user} has challenged you. Join the voice channel by **${timeString}** to avoid public shaming. Expected join time: **${expectedJoinTimeString}**`,

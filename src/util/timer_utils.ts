@@ -51,13 +51,13 @@ export const parseOnInTime = (message: string, options: ParseOptions = {}): mome
     value *= 60
   }
 
-  const timestamp = options.startTime || moment().tz('America/Denver')
+  const timestamp = options.startTime || moment()
 
   return timestamp.add(value, 'minute').startOf('minute')
 }
 
 const createDate = (hour: number, minute: number): moment.Moment => {
-  const date = moment().tz('America/Denver')
+  const date = moment()
 
   const currentHour = date.hour()
 

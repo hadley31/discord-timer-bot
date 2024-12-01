@@ -1,7 +1,7 @@
 import moment from 'moment-timezone'
 import { TimerService } from '../timers/timer_service'
 import type { Timer } from '../types'
-import { getJoinTimePercentage } from '../timers/timer_utils'
+import { getJoinTimePercentage } from '../util/timer_utils'
 
 export class TimerStatsService {
   private timerService: TimerService

@@ -62,6 +62,8 @@ export class RedisTimerRepository implements TimerRepository {
   async saveTimer(timer: Timer): Promise<Timer> {
     const timerEntity = this.timerToEntity(timer)
 
+    timerEntity[EntityId] = timer.id
+
     const entity = await this.timerRedisRepository.save(timerEntity)
 
     return this.entityToTimer(entity)

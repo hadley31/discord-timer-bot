@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'bun:test'
-import { autoDetectJoinEstimateMessage } from './timer_utils'
+import { autoDetectJoinEstimateMessage } from '../util/timer_utils'
 
 describe('autoDetectJoinEstimateMessage', async () => {
   describe("getting 'on in' messages", async () => {
