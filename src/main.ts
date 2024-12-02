@@ -21,18 +21,18 @@ client.once(Events.ClientReady, (readyClient) => {
 })
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  try {
-    if (!interaction.isChatInputCommand()) {
-      return
-    }
+  if (!interaction.isChatInputCommand()) {
+    return
+  }
 
-    for (const command of commands) {
+  for (const command of commands) {
+    try {
       if (interaction.commandName === command.data.name) {
         await command.execute(interaction)
       }
+    } catch (e) {
+      console.error(e)
     }
-  } catch (e) {
-    console.error(e)
   }
 })
 
