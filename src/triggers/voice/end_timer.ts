@@ -1,5 +1,5 @@
 import type { VoiceTrigger } from '../../types'
-import type { TextChannel } from 'discord.js'
+import type { TextChannel, VoiceState } from 'discord.js'
 import moment from 'moment-timezone'
 import { getJoinTimePercentage } from '../../util/timer_utils'
 import type { TimerService } from '../../timers/timer_service'
@@ -12,7 +12,7 @@ export class EndTimerVoiceTrigger implements VoiceTrigger {
     this.timerService = timerService
   }
 
-  async shouldExecute(oldState, newState) {
+  async shouldExecute(oldState: VoiceState, newState: VoiceState) {
     if (newState.channelId === null) {
       return false
     }
@@ -25,7 +25,7 @@ export class EndTimerVoiceTrigger implements VoiceTrigger {
     return timer != null && !timer.isComplete && timer.guildId === newState.guild.id
   }
 
-  async execute(oldState, newState) {
+  async execute(oldState: VoiceState, newState: VoiceState) {
     const userId = newState.member.id
     const guildId = newState.guild.id
 

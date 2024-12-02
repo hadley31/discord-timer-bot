@@ -1,4 +1,4 @@
-import type { ReactionTrigger } from '../../types'
+import type { DiscordReaction, DiscordUser, ReactionTrigger } from '../../types'
 import moment from 'moment-timezone'
 import { parseOnAtTime, parseOnInTime } from '../../util/timer_utils'
 import { TimerAlreadyExistsError, TimerCreationError } from '../../errors'
@@ -16,11 +16,11 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
     this.timerStatsService = timerStatsService
   }
 
-  async shouldExecute(reaction, user) {
+  async shouldExecute(reaction: DiscordReaction, user: DiscordUser) {
     return reaction.emoji.name == '⏲️' || reaction.emoji.name == '⏰'
   }
 
-  async execute(reaction, user) {
+  async execute(reaction: DiscordReaction, user: DiscordUser) {
     if (reaction.message.member.voice.channel != null) {
       throw new TimerCreationError('User is already in a voice channel')
     }

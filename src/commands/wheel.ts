@@ -1,9 +1,9 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder, type SlashCommandOptionsOnlyBuilder } from 'discord.js'
-import type { Command } from '../types'
+import type { Command, DiscordCommandOptions } from '../types'
 import { WheelOfNamesClient } from '../wheelofnames/wheel_client'
 
 export class WheelCommand implements Command {
-  public readonly data: SlashCommandOptionsOnlyBuilder
+  public readonly data: DiscordCommandOptions
   private readonly wheelOfNamesClient: WheelOfNamesClient
 
   constructor(wheelOfNamesClient: WheelOfNamesClient) {

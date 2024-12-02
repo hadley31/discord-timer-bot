@@ -11,8 +11,12 @@ import type {
 } from 'discord.js'
 import { Moment } from 'moment-timezone'
 
+export type DiscordReaction = MessageReaction | PartialMessageReaction
+export type DiscordUser = User | PartialUser
+export type DiscordCommandOptions = SlashCommandBuilder | SlashCommandOptionsOnlyBuilder
+
 export type Command = {
-  data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder
+  data: DiscordCommandOptions
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
 }
 
@@ -30,8 +34,8 @@ export type VoiceTrigger = {
 
 export type ReactionTrigger = {
   name: string
-  shouldExecute: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<boolean>
-  execute: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<void>
+  shouldExecute: (reaction: DiscordReaction, user: DiscordUser) => Promise<boolean>
+  execute: (reaction: DiscordReaction, user: DiscordUser) => Promise<void>
 }
 
 export type Timer = {
