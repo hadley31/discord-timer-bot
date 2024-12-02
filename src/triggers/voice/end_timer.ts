@@ -1,12 +1,18 @@
 import type { VoiceTrigger } from '../../types'
 import type { TextChannel } from 'discord.js'
-import { timerService } from '../../services'
 import moment from 'moment-timezone'
 import { getJoinTimePercentage } from '../../util/timer_utils'
+import type { TimerService } from '../../timers/timer_service'
 
-const trigger = <VoiceTrigger>{
-  name: 'End Timer',
-  test: async (oldState, newState) => {
+export class EndTimerVoiceTrigger implements VoiceTrigger {
+  public readonly name: string = 'End Timer'
+  private readonly timerService: TimerService
+
+  constructor(timerService: TimerService) {
+    this.timerService = timerService
+  }
+
+  async shouldExecute(oldState, newState) {
     if (newState.channelId === null) {
       return false
     }
@@ -14,20 +20,21 @@ const trigger = <VoiceTrigger>{
     const userId = newState.member.id
     const guildId = newState.guild.id
 
-    const timer = await timerService.getActiveTimerByUserId(userId, guildId)
+    const timer = await this.timerService.getActiveTimerByUserId(userId, guildId)
 
     return timer != null && !timer.isComplete && timer.guildId === newState.guild.id
-  },
-  execute: async (oldState, newState) => {
+  }
+
+  async execute(oldState, newState) {
     const userId = newState.member.id
     const guildId = newState.guild.id
 
-    let timer = await timerService.getActiveTimerByUserId(userId, guildId)
+    let timer = await this.timerService.getActiveTimerByUserId(userId, guildId)
 
     timer.joinTime = moment()
     timer.isComplete = true
 
-    timer = await timerService.saveTimer(timer)
+    timer = await this.timerService.saveTimer(timer)
 
     const channel = (await newState.client.channels.fetch(timer.channelId)) as TextChannel
 
@@ -50,7 +57,5 @@ const trigger = <VoiceTrigger>{
     }
 
     await message.reply(`<@${userId}> joined ${value} ${unit} **${earlyOrLate}**`)
-  },
+  }
 }
-
-export default trigger

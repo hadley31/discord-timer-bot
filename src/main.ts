@@ -43,7 +43,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 
   for (const trigger of reactionTriggers) {
     try {
-      if (await trigger.test(reaction, user)) {
+      if (await trigger.shouldExecute(reaction, user)) {
         await trigger.execute(reaction, user)
       }
     } catch (e) {
@@ -61,7 +61,7 @@ client.on(Events.MessageCreate, async (message) => {
 
   for (const trigger of textTriggers) {
     try {
-      if (await trigger.test(message)) {
+      if (await trigger.shouldExecute(message)) {
         await trigger.execute(message)
       }
     } catch (e) {
@@ -81,7 +81,7 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
 
   for (const trigger of voiceTriggers) {
     try {
-      if (await trigger.test(oldState, newState)) {
+      if (await trigger.shouldExecute(oldState, newState)) {
         await trigger.execute(oldState, newState)
       }
     } catch (e) {

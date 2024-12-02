@@ -1,12 +1,16 @@
+import type { Command } from './types'
 import { REST, Routes } from 'discord.js'
-import wheel from './commands/wheel'
+import { WheelCommand } from './commands/wheel'
+import { wheelOfNamesClient } from './services'
 
-export const commands = [wheel]
+const wheelCommand = new WheelCommand(wheelOfNamesClient)
+
+export const commands: Command[] = [wheelCommand]
 
 export const deployCommands = async () => {
   const token = process.env.DISCORD_TOKEN
   const clientId = process.env.DISCORD_CLIENT_ID
-  const guildId = process.env.DISCORD_GUILD_ID
+  // const guildId = process.env.DISCORD_GUILD_ID
 
   const rest = new REST().setToken(token)
 
@@ -16,7 +20,7 @@ export const deployCommands = async () => {
     const deployCommandsBody = commands.map((command) => command.data.toJSON())
 
     // The put method is used to fully refresh all commands in the guild with the current set
-    const data = (await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: deployCommandsBody })) as any[]
+    const data = (await rest.put(Routes.applicationCommands(clientId), { body: deployCommandsBody })) as any[]
 
     console.log(`Successfully reloaded ${data.length} application (/) commands.`)
   } catch (error) {

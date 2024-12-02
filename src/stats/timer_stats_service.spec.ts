@@ -27,7 +27,7 @@ test('getCompleteTimersByUserId', async () => {
   const service = new TimerStatsService(new TimerService(null))
 
   const timer: Timer = {
-    id: 1,
+    id: '1',
     userId: '1234',
     guildId: '5678',
     channelId: '1111',

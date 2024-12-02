@@ -1,14 +1,26 @@
-// Text Triggers
-import startTimer from './triggers/text/start_timer'
+import { timerService, timerStatsService } from './services'
+import type { ReactionTrigger, TextTrigger, VoiceTrigger } from './types'
 
-// Voice Triggers
-import endTimer from './triggers/voice/end_timer'
+// Import Text Triggers
+import { StartTimerTextTrigger } from './triggers/text/start_timer'
 
-// Reaction Triggers
-import challenge from './triggers/reaction/challenge'
+// Import Voice Triggers
+import { EndTimerVoiceTrigger } from './triggers/voice/end_timer'
 
-export const textTriggers = [startTimer]
+// Import Reaction Triggers
+import { ChallengeReactionTrigger } from './triggers/reaction/challenge'
 
-export const voiceTriggers = [endTimer]
+// Export Text Triggers
+const startTimerTextTrigger = new StartTimerTextTrigger(timerService)
 
-export const reactionTriggers = [challenge]
+export const textTriggers: TextTrigger[] = [startTimerTextTrigger]
+
+// Export Voice Triggers
+const endTimerVoiceTrigger = new EndTimerVoiceTrigger(timerService)
+
+export const voiceTriggers: VoiceTrigger[] = [endTimerVoiceTrigger]
+
+// Export Reaction Triggers
+const challengeReactionTrigger = new ChallengeReactionTrigger(timerService, timerStatsService)
+
+export const reactionTriggers: ReactionTrigger[] = [challengeReactionTrigger]

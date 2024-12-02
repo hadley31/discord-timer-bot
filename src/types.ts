@@ -5,31 +5,32 @@ import type {
   PartialMessageReaction,
   PartialUser,
   SlashCommandBuilder,
+  SlashCommandOptionsOnlyBuilder,
   User,
   VoiceState,
 } from 'discord.js'
-import { Moment } from 'moment'
+import { Moment } from 'moment-timezone'
 
 export type Command = {
-  data: SlashCommandBuilder
+  data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
 }
 
 export type TextTrigger = {
   name: string
-  test: (message: Message) => Promise<boolean>
+  shouldExecute: (message: Message) => Promise<boolean>
   execute: (interaction: Message) => Promise<void>
 }
 
 export type VoiceTrigger = {
   name: string
-  test: (oldState: VoiceState, newState: VoiceState) => Promise<boolean>
+  shouldExecute: (oldState: VoiceState, newState: VoiceState) => Promise<boolean>
   execute: (oldState: VoiceState, newState: VoiceState) => Promise<void>
 }
 
 export type ReactionTrigger = {
   name: string
-  test: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<boolean>
+  shouldExecute: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<boolean>
   execute: (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => Promise<void>
 }
 

@@ -1,22 +1,29 @@
-import { timerService } from '../../services'
 import type { TextTrigger } from '../../types'
 import { ChannelType, type VoiceChannel, type Message } from 'discord.js'
 import { calculateTimerEndTime, autoDetectJoinEstimateMessage } from '../../util/timer_utils'
 import moment from 'moment-timezone'
 import { formatWithTimezone } from '../../util/discord_utils'
+import type { TimerService } from '../../timers/timer_service'
 
-const trigger = <TextTrigger>{
-  name: 'Start Timer',
-  async test(message: Message) {
+export class StartTimerTextTrigger implements TextTrigger {
+  public readonly name: string = 'Start Timer'
+  private readonly timerService: TimerService
+
+  constructor(timerService: TimerService) {
+    this.timerService = timerService
+  }
+
+  async shouldExecute(message: Message) {
     return autoDetectJoinEstimateMessage(message.content)
-  },
+  }
+
   async execute(message: Message) {
     if (message.member.voice.channel != null) {
       console.log('User is already in a voice channel')
       return
     }
 
-    const timer = await timerService.getActiveTimerByUserId(message.author.id, message.guild.id)
+    const timer = await this.timerService.getActiveTimerByUserId(message.author.id, message.guild.id)
 
     if (timer) {
       console.log(`User already has an active timer in this guild ending at ${formatWithTimezone(timer.endTime)}`)
@@ -47,7 +54,7 @@ const trigger = <TextTrigger>{
     const guildId = message.guild.id
     const startTime = moment(message.createdAt)
 
-    await timerService.createTimer({
+    await this.timerService.createTimer({
       userId,
       channelId,
       messageId,
@@ -57,7 +64,5 @@ const trigger = <TextTrigger>{
     })
 
     await message.react('⏲️')
-  },
+  }
 }
-
-export default trigger
