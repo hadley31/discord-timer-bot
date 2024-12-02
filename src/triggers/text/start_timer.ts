@@ -2,8 +2,8 @@ import type { TextTrigger } from '../../types'
 import { ChannelType, type VoiceChannel, type Message } from 'discord.js'
 import { calculateTimerEndTime, autoDetectJoinEstimateMessage } from '../../util/timer_utils'
 import moment from 'moment-timezone'
-import { formatWithTimezone } from '../../util/discord_utils'
 import type { TimerService } from '../../timers/timer_service'
+import { TimerAlreadyExistsError, TimerCreationError } from '../../errors'
 
 export class StartTimerTextTrigger implements TextTrigger {
   public readonly name: string = 'Start Timer'
@@ -19,22 +19,19 @@ export class StartTimerTextTrigger implements TextTrigger {
 
   async execute(message: Message) {
     if (message.member.voice.channel != null) {
-      console.log('User is already in a voice channel')
-      return
+      throw new TimerCreationError('User is already in a voice channel')
     }
 
     const timer = await this.timerService.getActiveTimerByUserId(message.author.id, message.guild.id)
 
     if (timer) {
-      console.log(`User already has an active timer in this guild ending at ${formatWithTimezone(timer.endTime)}`)
-      return
+      throw new TimerAlreadyExistsError(timer)
     }
 
     const endTime = calculateTimerEndTime(message.content)
 
     if (endTime == null) {
-      console.error('Error while parsing time')
-      return
+      throw new TimerCreationError(`Unable to parse end time from user message: '${message.content}'`)
     }
 
     const userInVoiceChannel = message.guild.channels.cache
@@ -42,8 +39,7 @@ export class StartTimerTextTrigger implements TextTrigger {
       .some((channel) => (channel as VoiceChannel).members.size > 0)
 
     if (!userInVoiceChannel) {
-      console.log('No voice channels with members')
-      return
+      throw new TimerCreationError('There must be at least one user in a voice channel to automatically start a timer')
     }
 
     console.log(`Starting timer for ${message.author.username} at ending at ${endTime}`)
