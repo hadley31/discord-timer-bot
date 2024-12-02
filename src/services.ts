@@ -8,10 +8,12 @@ const { REDIS_HOST } = process.env
 
 const getTimerRepository = async (): Promise<TimerRepository> => {
   if (REDIS_HOST) {
+    console.log(`Redis host configured. Using redis for timer store: ${REDIS_HOST}`)
     const repository = new RedisTimerRepository(REDIS_HOST)
     await repository.init()
     return repository
   } else {
+    console.warn('No redis host configured. Using default implementation.')
     return new SimpleTimerRepository()
   }
 }
