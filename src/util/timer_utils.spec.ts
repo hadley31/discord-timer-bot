@@ -23,6 +23,8 @@ describe('autoDetectJoinEstimateMessage', async () => {
       'cs in 10 min',
       'cs2 10 mins',
       'cs2 in 20 minutes',
+      "i'll need another 10 minutes",
+      'i need another like 6 mins',
     ]
 
     for (const message of expectTrueMessages) {
