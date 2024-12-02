@@ -2,7 +2,7 @@ import type { DiscordReaction, DiscordUser, ReactionTrigger } from '../../types'
 import moment from 'moment-timezone'
 import { parseOnAtTime, parseOnInTime } from '../../util/timer_utils'
 import { TimerAlreadyExistsError, TimerCreationError } from '../../errors'
-import { formatWithTimezone } from '../../util/discord_utils'
+import { formatWithTimezone } from '../../util/moment_utils'
 import { TimerService } from '../../timers/timer_service'
 import { TimerStatsService } from '../../stats/timer_stats_service'
 
