@@ -8,14 +8,21 @@ describe('autoDetectJoinEstimateMessage', async () => {
       'gimmie 20 min',
       'i can join in 10 mins',
       'joining in like 25',
-      'give me about 2 minutes',
+      'sure give me about like ~2 minutes',
       "i'll be on in 5 minutes",
       'ill be bout like 8 mins',
-      'sure like 10 minutes',
       'getting oun in around 45 minutes',
       'i need like 10 minutes',
       'i need 5 minutes',
+      'i need another 10 min',
       "i'll need around 2 hours",
+      'i can game in like 2 hours',
+      'i can play 10 minutes',
+      'getting oun, like 5 mins',
+      'getting on, 5 mins',
+      'cs in 10 min',
+      'cs2 10 mins',
+      'cs2 in 20 minutes',
     ]
 
     for (const message of expectTrueMessages) {

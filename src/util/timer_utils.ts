@@ -2,7 +2,7 @@ import moment from 'moment-timezone'
 import type { Timer } from '../types'
 
 const onInRegexAutoDetect =
-  /(?:getting ou?n in|joining in|i can join in|give me|gimmi?e|i('?ll)? need|i'?ll be(?: on)?(?: in)?|sure|ok(?:ay)?|^)\s*(?:around|a?bout|~)?\s*(?:maybe)?\s*(?:like)?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
+  /(?:getting ou?n(:?\s+in)?|cs2?(?:\s+in)?|joining in|i can (?:join|play|game)(?:\s*in)?|give me|gimmi?e|i(?:'?ll)? need|i'?ll be(?: ou?n(?: in)?)?)\s*,?\s*(?:around|a?bout|another)?\s*(?:maybe)?\s*(?:like)?\s*~?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
 const onAtRegexAutoDetect = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|around|~)\s*(?:maybe|a?bout)?\s*(?:like)?\s*([\d:]+\s*)/i
 
 const onInRegex = /(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i

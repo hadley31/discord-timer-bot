@@ -27,6 +27,11 @@ export class TimerStatsService {
     return TimerStatsService.interpolateTimestamp(timer.startTime, timer.endTime, expectedPercentage)
   }
 
+  public async getUserOnTimePercentage(userId: string, guildId: string) {
+    const timers = await this.timerService.getAllTimersByUserId(userId, guildId)
+    return timers.filter((t) => t.joinTime <= t.endTime).length / timers.length
+  }
+
   private static interpolateTimestamp(start: moment.Moment, end: moment.Moment, t: number): moment.Moment {
     return start.clone().add(end.diff(start, 'minutes') * t, 'minutes')
   }
