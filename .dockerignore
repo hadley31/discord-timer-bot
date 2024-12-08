@@ -1,6 +1,6 @@
 **/node_modules/
 **/README.md
-**/.env-example
+**/.env.example
 **/.env
 **/*.log
 **/*.spec.ts
