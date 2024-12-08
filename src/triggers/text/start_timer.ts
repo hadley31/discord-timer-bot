@@ -4,6 +4,7 @@ import { calculateTimerEndTime, autoDetectJoinEstimateMessage } from '../../util
 import moment from 'moment-timezone'
 import type { TimerService } from '../../timers/timer_service'
 import { TimerAlreadyExistsError, TimerCreationError } from '../../errors'
+import logger from '../../util/logger'
 
 export class StartTimerTextTrigger implements TextTrigger {
   public readonly name: string = 'Start Timer'
@@ -42,7 +43,7 @@ export class StartTimerTextTrigger implements TextTrigger {
       throw new TimerCreationError('There must be at least one user in a voice channel to automatically start a timer')
     }
 
-    console.log(`Starting timer for ${message.author.username} at ending at ${endTime}`)
+    logger.info(`Starting timer for ${message.author.username} at ending at ${endTime}`)
 
     const userId = message.author.id
     const channelId = message.channel.id

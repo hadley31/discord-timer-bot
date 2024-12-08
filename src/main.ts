@@ -15,9 +15,10 @@ const client = new Client({
 
 import { textTriggers, voiceTriggers, reactionTriggers } from './triggers'
 import { commands } from './commands'
+import logger from './util/logger'
 
 client.once(Events.ClientReady, (readyClient) => {
-  console.log(`Ready! Logged in as ${readyClient.user.tag}`)
+  logger.info(`Ready! Logged in as ${readyClient.user.tag}`)
 })
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -31,7 +32,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await command.execute(interaction)
       }
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
   }
 })
@@ -47,7 +48,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
         await trigger.execute(reaction, user)
       }
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
   }
 })
@@ -57,7 +58,7 @@ client.on(Events.MessageCreate, async (message) => {
     return
   }
 
-  console.log(`${message.author.username} (${message.author.id}) says: ${message.toString()}`)
+  logger.info(`${message.author.username} (${message.author.id}) says: ${message.toString()}`)
 
   for (const trigger of textTriggers) {
     try {
@@ -65,7 +66,7 @@ client.on(Events.MessageCreate, async (message) => {
         await trigger.execute(message)
       }
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
   }
 })
@@ -76,7 +77,7 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
   }
 
   if (!oldState.channelId && newState.channelId) {
-    console.log(`${oldState.member.user.username} (${oldState.member.user.id}) joined voice channel: ${newState.channel.name}`)
+    logger.info(`${oldState.member.user.username} (${oldState.member.user.id}) joined voice channel: ${newState.channel.name}`)
   }
 
   for (const trigger of voiceTriggers) {
@@ -85,7 +86,7 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         await trigger.execute(oldState, newState)
       }
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
   }
 })

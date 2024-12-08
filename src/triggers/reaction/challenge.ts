@@ -5,6 +5,7 @@ import { TimerAlreadyExistsError, TimerCreationError } from '../../errors'
 import { formatWithTimezone } from '../../util/moment_utils'
 import { TimerService } from '../../timers/timer_service'
 import { TimerStatsService } from '../../stats/timer_stats_service'
+import logger from '../../util/logger'
 
 export class ChallengeReactionTrigger implements ReactionTrigger {
   public readonly name: string = 'Challenge Timer'
@@ -46,7 +47,7 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
       throw new TimerCreationError('Could not parse time from message content: ' + messageContent)
     }
 
-    console.log(`Starting timer for ${reaction.message.author.username} at ending at ${endTime}`)
+    logger.info(`Starting timer for ${reaction.message.author.username} at ending at ${endTime}`)
 
     const newTimer = await this.timerService.createTimer({
       userId,
