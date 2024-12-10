@@ -1,5 +1,6 @@
-import { expect, test, describe } from 'bun:test'
-import { autoDetectJoinEstimateMessage } from '../util/timer_utils'
+import { expect, test, describe, it } from 'bun:test'
+import { autoDetectJoinEstimateMessage, parseOnInTime } from '../util/timer_utils'
+import moment from 'moment-timezone'
 
 describe('autoDetectJoinEstimateMessage', async () => {
   describe("getting 'on in' messages", async () => {
@@ -71,4 +72,47 @@ describe('autoDetectJoinEstimateMessage', async () => {
       })
     }
   })
+})
+
+describe('parseOnInTime', async () => {
+  const startTime = moment('2021-01-01 00:00:00')
+  const messages = {
+    'gimme 5 minutes': 5,
+    'gimmie 20 min': 20,
+    'i can join in 10 mins': 10,
+    'joining in like 25': 25,
+    'sure give me about like ~2 minutes': 2,
+    "i'll be on in 5 minutes": 5,
+    'ill be bout like 8 mins': 8,
+    'getting oun in around 45 minutes': 45,
+    'i need like 10 minutes': 10,
+    'i need 5 minutes': 5,
+    'i need another 10 min': 10,
+    "i'll need around 2 hours": 120,
+    'i can game in like 2 hours': 120,
+    'i can play 10 minutes': 10,
+    'getting oun, like 5 mins': 5,
+    'getting on, 5 mins': 5,
+    'cs in 10 min': 10,
+    'cs2 10 mins': 10,
+    'cs2 in 20 minutes': 20,
+    "i'll need another 10 minutes": 10,
+    'i need another like 6 mins': 6,
+  }
+
+  for (const [message, minutes] of Object.entries(messages)) {
+    describe(`when the message is '${message}'`, async () => {
+      it(`should return ${minutes} minutes later`, async () => {
+        const expected = startTime.clone().add(minutes, 'minutes').endOf('minute')
+
+        const result = parseOnInTime(message, { startTime })
+
+        expect(result).toEqual(expected)
+      })
+    })
+  }
+})
+
+describe('parseOnAtTime', async () => {
+  describe('', async () => {})
 })

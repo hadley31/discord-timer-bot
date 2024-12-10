@@ -5,7 +5,7 @@ const onInRegexAutoDetect =
   /(?:getting ou?n(:?\s+in)?|cs2?(?:\s+in)?|joining in|i can (?:join|play|game)(?:\s*in)?|give me|gimmi?e|i(?:'?ll)? need|i'?ll be(?: ou?n(?: in)?)?)\s*,?\s*(?:around|a?bout|another)?\s*(?:maybe)?\s*(?:like)?\s*~?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
 const onAtRegexAutoDetect = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|around|~)\s*(?:maybe|a?bout)?\s*(?:like)?\s*([\d:]+\s*)/i
 
-const onInRegex = /(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
+const onInRegex = /(one|two|three|four|five|ten|(?<!\w+)\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
 const onAtRegex = /at\s*([\d:]+)/i
 
 const regexes = [onInRegex, onAtRegex]
@@ -51,9 +51,9 @@ export const parseOnInTime = (message: string, options: ParseOptions = {}): mome
     value *= 60
   }
 
-  const timestamp = options.startTime || moment()
+  const timestamp = options.startTime.clone() || moment()
 
-  return timestamp.add(value, 'minute').startOf('minute')
+  return timestamp.add(value, 'minute').endOf('minute')
 }
 
 const createDate = (hour: number, minute: number): moment.Moment => {
@@ -82,16 +82,16 @@ export const parseOnAtTime = (message: string): moment.Moment => {
   if (time.includes(':')) {
     const [hourOfDay, minuteOfHour] = time.split(':').map((n) => parseInt(n))
 
-    return createDate(hourOfDay, minuteOfHour).startOf('minute')
+    return createDate(hourOfDay, minuteOfHour).endOf('minute')
   } else if (time.length <= 2) {
     const hourOfDay = parseInt(time)
 
-    return createDate(hourOfDay, 0).startOf('hour')
+    return createDate(hourOfDay, 0).startOf('hour').endOf('minute')
   } else {
     let hourOfDay = parseInt(time.slice(0, -2))
     const minuteOfHour = parseInt(time.slice(-2))
 
-    return createDate(hourOfDay, minuteOfHour).startOf('minute')
+    return createDate(hourOfDay, minuteOfHour).endOf('minute')
   }
 }
 
