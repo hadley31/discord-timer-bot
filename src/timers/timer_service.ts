@@ -58,7 +58,7 @@ export class TimerService {
     return this.timerRepository.getTimersByGuildId(guildId)
   }
 
-  deleteTimerById(id: string) {
-    this.timerRepository.deleteTimerById(id)
+  async deleteTimerById(id: string) {
+    return this.timerRepository.deleteTimerById(id)
   }
 }
