@@ -24,7 +24,7 @@ export class TimerService {
     const now = moment()
 
     if (timer.endTime.isBefore(now)) {
-      throw new TimerCreationError('Expiration time is in the past')
+      throw new TimerCreationError('Timer expiration time is in the past')
     }
 
     const newTimer = <Timer>{

@@ -51,7 +51,7 @@ export const parseOnInTime = (message: string, options: ParseOptions = {}): mome
     value *= 60
   }
 
-  const timestamp = options.startTime.clone() || moment()
+  const timestamp = options.startTime?.clone() || moment()
 
   return timestamp.add(value, 'minute').endOf('minute')
 }
