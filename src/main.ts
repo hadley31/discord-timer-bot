@@ -71,6 +71,15 @@ client.on(Events.MessageCreate, async (message) => {
   }
 })
 
+client.on(Events.MessageDelete, async (message) => {
+  if (message.author.id !== client.user.id) {
+    return
+  }
+
+  logger.info(`A message was deleted: ${message.content}`)
+  message.channel.send(`A message was deleted:\n> ${message.content}`)
+})
+
 client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
   if (oldState.member.user.bot) {
     return
