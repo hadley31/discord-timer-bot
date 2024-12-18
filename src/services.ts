@@ -4,6 +4,8 @@ import { SimpleTimerRepository, type TimerRepository } from './timers/timer_repo
 import { TimerService } from './timers/timer_service'
 import logger from './util/logger'
 import { WheelOfNamesClient } from './wheelofnames/wheel_client'
+import { client } from './discord'
+import { CancelExpiredTimersCron } from './scheduled/cancel_expired_timers'
 
 const { REDIS_HOST } = process.env
 
@@ -22,6 +24,8 @@ const getTimerRepository = async (): Promise<TimerRepository> => {
 const timerRepository = await getTimerRepository()
 
 export const timerService = new TimerService(timerRepository)
+
+export const cancelExpiredTimersCron = new CancelExpiredTimersCron(timerRepository, client)
 
 export const timerStatsService = new TimerStatsService(timerService)
 

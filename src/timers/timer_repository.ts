@@ -1,3 +1,4 @@
+import moment from 'moment-timezone'
 import type { Timer } from '../types'
 
 export interface TimerRepository {
@@ -6,6 +7,7 @@ export interface TimerRepository {
   getTimerByMessageId(messageId: string): Promise<Timer>
   saveTimer(timer: Timer): Promise<Timer>
   deleteTimerById(id: string): Promise<void>
+  getIncompleteTimersOlderThan(timestamp: moment.Moment): Promise<Timer[]>
 }
 
 export class SimpleTimerRepository implements TimerRepository {
@@ -34,5 +36,9 @@ export class SimpleTimerRepository implements TimerRepository {
 
   async deleteTimerById(id: string): Promise<void> {
     this.timers = this.timers.filter((timer) => timer.id !== id)
+  }
+
+  async getIncompleteTimersOlderThan(timestamp: moment.Moment): Promise<Timer[]> {
+    return this.timers.filter((timer) => !timer.isComplete && timer.endTime.isBefore(timestamp))
   }
 }

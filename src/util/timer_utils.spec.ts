@@ -1,5 +1,5 @@
 import { expect, test, describe, it } from 'bun:test'
-import { autoDetectJoinEstimateMessage, parseOnInTime } from '../util/timer_utils'
+import { autoDetectJoinEstimateMessage, parseOnInTime, testOnInRegexes } from '../util/timer_utils'
 import moment from 'moment-timezone'
 
 describe('autoDetectJoinEstimateMessage', async () => {
@@ -98,6 +98,7 @@ describe('parseOnInTime', async () => {
     'cs2 in 20 minutes': 20,
     "i'll need another 10 minutes": 10,
     'i need another like 6 mins': 6,
+    'i can join in 1.5 hours': 90,
   }
 
   for (const [message, minutes] of Object.entries(messages)) {
@@ -115,4 +116,32 @@ describe('parseOnInTime', async () => {
 
 describe('parseOnAtTime', async () => {
   describe('', async () => {})
+})
+
+describe('testPresetDurations', async () => {
+  describe('when the message contains a preset duration', async () => {
+    it('should return 90 minutes', async () => {
+      const result = testOnInRegexes("I'll be on in an hour and a half")
+
+      expect(result).toBe(90)
+    })
+
+    it('should return 150 minutes', async () => {
+      const result = testOnInRegexes("I'll be on in an two and a half hours")
+
+      expect(result).toBe(150)
+    })
+
+    it('should return 210 minutes', async () => {
+      const result = testOnInRegexes("I'll be on in an three and a half hours")
+
+      expect(result).toBe(210)
+    })
+
+    it('should return 150 minutes', async () => {
+      const result = testOnInRegexes("I'll be on in an 2 and a half hours")
+
+      expect(result).toBe(150)
+    })
+  })
 })

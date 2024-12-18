@@ -1,21 +1,11 @@
-import { Client, Events, GatewayIntentBits } from 'discord.js'
+import { Events } from 'discord.js'
 
 const { DISCORD_TOKEN } = process.env
-
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMessageReactions,
-    GatewayIntentBits.GuildVoiceStates,
-  ],
-})
 
 import { textTriggers, voiceTriggers, reactionTriggers } from './triggers'
 import { commands } from './commands'
 import logger from './util/logger'
+import { client } from './discord'
 
 client.once(Events.ClientReady, (readyClient) => {
   logger.info(`Ready! Logged in as ${readyClient.user.tag}`)

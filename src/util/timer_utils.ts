@@ -5,10 +5,19 @@ const onInRegexAutoDetect =
   /(?:getting ou?n(:?\s+in)?|cs2?(?:\s+in)?|joining in|i can (?:join|play|game)(?:\s*in)?|give me|gimmi?e|i(?:'?ll)? need|i'?ll be(?: ou?n(?: in)?)?)\s*,?\s*(?:around|a?bout|another)?\s*(?:maybe)?\s*(?:like)?\s*~?\s*(one|two|three|four|five|ten|\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?(?!late)/i
 const onAtRegexAutoDetect = /(?:getting ou?n|joining|i can join|i can|i can play)\s*(?:at|around|~)\s*(?:maybe|a?bout)?\s*(?:like)?\s*([\d:]+\s*)/i
 
-const onInRegex = /(one|two|three|four|five|ten|(?<!\w+)\d+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/i
+const onInRegexes = [
+  { regex: /hour and a half/i, func: () => 90 },
+  { regex: /(one|two|three|four|five|ten|[\d\.]+)\s+and\s+a\s+half\s+hours?/i, func: (n: string) => parseNumeric(n) * 60 + 30 },
+  { regex: /half\s+(?:an\s+)?hour/i, func: () => 30 },
+  {
+    regex: /(one|two|three|four|five|ten|(?<!\w+)[\d\.]+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/,
+    func: (n: string, u: string) => parseNumericWithUnit(n, u),
+  },
+]
+
 const onAtRegex = /at\s*([\d:]+)/i
 
-const regexes = [onInRegex, onAtRegex]
+const regexes = [...onInRegexes.map((x) => x.regex), onAtRegex]
 const regexesAutoDetect = [onInRegexAutoDetect, onAtRegexAutoDetect]
 
 type ParseOptions = {
@@ -30,41 +39,58 @@ const parseNumeric = (text: string) => {
     case 'ten':
       return 10
     default:
-      return parseInt(text)
+      return parseFloat(text)
   }
 }
 
-export const parseOnInTime = (message: string, options: ParseOptions = {}): moment.Moment => {
-  const match = onInRegex.exec(message)
-
-  if (!match) {
-    return
-  }
-
-  let value = parseNumeric(match[1])
-  const unit = match[2] || 'm'
+export const parseNumericWithUnit = (text: string, unit: string): number => {
+  let value = parseNumeric(text)
+  unit ??= 'm'
 
   if (unit.startsWith('s')) {
     value = 3
   }
+
   if (unit.startsWith('h')) {
     value *= 60
   }
 
+  return value
+}
+
+export const testOnInRegexes = (message: string): number => {
+  for (const { regex, func } of onInRegexes) {
+    const match = regex.exec(message)
+
+    if (match) {
+      return func(match[1], match[2])
+    }
+  }
+
+  return null
+}
+
+export const parseOnInTime = (message: string, options: ParseOptions = {}): moment.Moment => {
+  const minutes = testOnInRegexes(message)
+
+  if (!minutes) {
+    return
+  }
+
   const timestamp = options.startTime?.clone() || moment()
 
-  return timestamp.add(value, 'minute').endOf('minute')
+  return timestamp.add(minutes, 'minute').endOf('minute')
 }
 
 const createDate = (hour: number, minute: number): moment.Moment => {
-  const date = moment()
-
-  const currentHour = date.hour()
+  const date = moment().tz('America/Denver')
 
   date.hour(hour).minute(minute)
 
-  if (currentHour > hour) {
-    date.add(12, 'hour')
+  const now = moment()
+
+  while (date.isBefore(now)) {
+    date.add(12, 'hours')
   }
 
   return date

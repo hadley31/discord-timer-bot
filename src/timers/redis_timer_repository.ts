@@ -29,6 +29,8 @@ const timerSchema = new Schema<RedisTimerEntity>('timer', {
 const USER_ID = 'userId'
 const GUILD_ID = 'guildId'
 const MESSAGE_ID = 'messageId'
+const END_TIME = 'endTime'
+const IS_COMPLETE = 'isComplete'
 
 export class RedisTimerRepository implements TimerRepository {
   private readonly redis: RedisClientType
@@ -71,6 +73,11 @@ export class RedisTimerRepository implements TimerRepository {
 
   async deleteTimerById(id: string): Promise<void> {
     await this.timerRedisRepository.remove(id)
+  }
+
+  async getIncompleteTimersOlderThan(timestamp: moment.Moment): Promise<Timer[]> {
+    const timerEntities = await this.timerRedisRepository.search().where(END_TIME).lt(timestamp.toDate()).and(IS_COMPLETE).eq(false).return.all()
+    return timerEntities.map(this.entityToTimer)
   }
 
   private entityToTimer(entity: RedisTimerEntity): Timer {
