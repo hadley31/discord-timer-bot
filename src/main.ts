@@ -6,6 +6,7 @@ import { textTriggers, voiceTriggers, reactionTriggers } from './triggers'
 import { commands } from './commands'
 import logger from './util/logger'
 import { client } from './discord'
+import { TimerCreationError } from './errors'
 
 client.once(Events.ClientReady, (readyClient) => {
   logger.info(`Ready! Logged in as ${readyClient.user.tag}`)
@@ -22,7 +23,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await command.execute(interaction)
       }
     } catch (e) {
-      logger.error(e)
+      handleTimerError(e)
     }
   }
 })
@@ -38,7 +39,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
         await trigger.execute(reaction, user)
       }
     } catch (e) {
-      logger.error(e)
+      handleTimerError(e)
     }
   }
 })
@@ -56,7 +57,7 @@ client.on(Events.MessageCreate, async (message) => {
         await trigger.execute(message)
       }
     } catch (e) {
-      logger.error(e)
+      handleTimerError(e)
     }
   }
 })
@@ -89,5 +90,13 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     }
   }
 })
+
+const handleTimerError = (error: unknown) => {
+  if (error instanceof TimerCreationError) {
+    logger.warn(error)
+  } else {
+    logger.error(error)
+  }
+}
 
 client.login(DISCORD_TOKEN)
