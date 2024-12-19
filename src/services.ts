@@ -11,7 +11,7 @@ const { REDIS_HOST } = process.env
 
 const getTimerRepository = async (): Promise<TimerRepository> => {
   if (REDIS_HOST) {
-    logger.info(`Redis host configured. Using redis for timer store: ${REDIS_HOST}`)
+    logger.info(`Redis host configured. Using redis for timer store with host: ${REDIS_HOST}:6379`)
     const repository = new RedisTimerRepository(REDIS_HOST)
     await repository.init()
     return repository

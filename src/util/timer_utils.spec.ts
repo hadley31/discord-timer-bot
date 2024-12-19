@@ -99,6 +99,7 @@ describe('parseOnInTime', async () => {
     "i'll need another 10 minutes": 10,
     'i need another like 6 mins': 6,
     'i can join in 1.5 hours': 90,
+    'Can I play a premo with yall in 45-hour?': 45,
   }
 
   for (const [message, minutes] of Object.entries(messages)) {

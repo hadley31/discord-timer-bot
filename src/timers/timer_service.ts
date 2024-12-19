@@ -13,12 +13,12 @@ export class TimerService {
   async createTimer(timer: CreateTimerRequest): Promise<Timer> {
     const existingTimerOnMessage = await this.timerRepository.getTimerByMessageId(timer.messageId)
     if (existingTimerOnMessage) {
-      throw new TimerCreationError('A timer already exists for message: ' + timer.messageId)
+      throw new TimerCreationError(`A timer already exists for message: ${timer.messageId}`)
     }
 
     const existingActiveTimer = await this.getActiveTimerByUserId(timer.userId, timer.guildId)
     if (existingActiveTimer) {
-      throw new TimerCreationError('A timer is already active for user: ' + timer.userId + ' in guild: ' + timer.guildId)
+      throw new TimerCreationError(`A timer is already active for user: ${timer.userId} in guild: ${timer.guildId}`)
     }
 
     const now = moment()

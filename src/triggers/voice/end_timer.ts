@@ -1,5 +1,5 @@
 import type { VoiceTrigger } from '../../types'
-import type { TextChannel, VoiceState } from 'discord.js'
+import { userMention, bold, type TextChannel, type VoiceState } from 'discord.js'
 import moment from 'moment-timezone'
 import { getJoinTimePercentage } from '../../util/timer_utils'
 import type { TimerService } from '../../timers/timer_service'
@@ -52,10 +52,10 @@ export class EndTimerVoiceTrigger implements VoiceTrigger {
     const message = await channel.messages.fetch(timer.messageId)
 
     if (timer.endTime.diff(moment(), 'minutes') > 5 && getJoinTimePercentage(timer) < 0.3) {
-      await message.reply(`<@${userId}> joined **way too early**. Shame on you!`)
+      await message.reply(`${userMention(userId)} joined ${bold('way too early')}. Shame on you!`)
       return
     }
 
-    await message.reply(`<@${userId}> joined ${value} ${unit} **${earlyOrLate}**`)
+    await message.reply(`${userMention(userId)} joined ${value} ${unit} ${bold(earlyOrLate)}`)
   }
 }

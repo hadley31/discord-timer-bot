@@ -6,6 +6,7 @@ import { formatWithTimezone } from '../../util/moment_utils'
 import { TimerService } from '../../timers/timer_service'
 import { TimerStatsService } from '../../stats/timer_stats_service'
 import logger from '../../util/logger'
+import { bold } from 'discord.js'
 
 export class ChallengeReactionTrigger implements ReactionTrigger {
   public readonly name: string = 'Challenge Timer'
@@ -26,6 +27,8 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
       throw new TimerCreationError('User is already in a voice channel')
     }
 
+    logger.info(`${user.username} reacted with ${reaction.emoji.name} to ${reaction.message.author.username}'s message`)
+
     const userId = reaction.message.author.id
     const channelId = reaction.message.channel.id
     const guildId = reaction.message.guild.id
@@ -44,7 +47,7 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
     const endTime = reaction.emoji.name === '⏲️' ? parseOnInTime(messageContent, { startTime }) : parseOnAtTime(messageContent)
 
     if (!endTime) {
-      throw new TimerCreationError('Could not parse time from message content: ' + messageContent)
+      throw new TimerCreationError(`Could not parse time from message content: ${messageContent}`)
     }
 
     logger.info(`Starting timer for ${reaction.message.author.username} at ending at ${endTime}`)
@@ -65,7 +68,9 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
     const expectedJoinTimeString = formatWithTimezone(expectedJoinTime)
 
     reaction.message.reply(
-      `${user} has challenged you. Join the voice channel by **${timeString}** to avoid public shaming. Expected join time: **${expectedJoinTimeString}**`,
+      `${user} has challenged you. Join the voice channel by ${bold(timeString)} to avoid public shaming. Expected join time: ${bold(
+        expectedJoinTimeString,
+      )}`,
     )
   }
 }

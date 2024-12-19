@@ -121,5 +121,9 @@ export const detectJoinEstimateMessage = (message: string): boolean => {
 }
 
 export const getJoinTimePercentage = (timer: Timer): number => {
-  return timer.joinTime.diff(timer.startTime, 'minutes') / timer.endTime.diff(timer.startTime, 'minutes')
+  if (!timer.joinTime) {
+    return 0
+  }
+
+  return timer.joinTime.diff(timer.startTime, 'seconds') / timer.endTime.diff(timer.startTime, 'seconds')
 }

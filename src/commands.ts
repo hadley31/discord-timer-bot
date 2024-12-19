@@ -1,12 +1,14 @@
 import type { Command } from './types'
 import { REST, Routes } from 'discord.js'
 import { WheelCommand } from './commands/wheel'
-import { wheelOfNamesClient } from './services'
+import { timerStatsService, wheelOfNamesClient } from './services'
 import logger from './util/logger'
+import { LeaderboardCommand } from './commands/leaderboard'
 
 const wheelCommand = new WheelCommand(wheelOfNamesClient)
+const leaderboardCommand = new LeaderboardCommand(timerStatsService)
 
-export const commands: Command[] = [wheelCommand]
+export const commands: Command[] = [wheelCommand, leaderboardCommand]
 
 export const deployCommands = async () => {
   const token = process.env.DISCORD_TOKEN

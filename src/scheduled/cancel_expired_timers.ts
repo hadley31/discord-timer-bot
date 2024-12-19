@@ -1,7 +1,7 @@
 import moment from 'moment-timezone'
 import { type TimerRepository } from '../timers/timer_repository'
 import { Cron } from 'croner'
-import { TextChannel, type Client } from 'discord.js'
+import { TextChannel, userMention, type Client } from 'discord.js'
 import logger from '../util/logger'
 
 export class CancelExpiredTimersCron {
@@ -35,7 +35,7 @@ export class CancelExpiredTimersCron {
 
       await this.timerRepository.saveTimer(timer)
 
-      message.reply(`<@${timer.userId}> never joined :slight_frown:`)
+      await message.reply(`${userMention(timer.userId)} never joined :slight_frown:`)
     })
   }
 }
