@@ -50,6 +50,14 @@ export type Timer = {
   isComplete: boolean
 }
 
+export type UserStats = {
+  userId: string
+  totalTimers: number
+  onTimePercentage: number
+  joinTimeAccuracy: number
+  expiredTimers: number
+}
+
 export type CreateTimerRequest = {
   userId: string
   channelId: string

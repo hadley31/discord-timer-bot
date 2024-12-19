@@ -4,11 +4,13 @@ import { WheelCommand } from './commands/wheel'
 import { timerStatsService, wheelOfNamesClient } from './services'
 import logger from './util/logger'
 import { LeaderboardCommand } from './commands/leaderboard'
+import { UserStatsCommand } from './commands/user_stats'
 
 const wheelCommand = new WheelCommand(wheelOfNamesClient)
 const leaderboardCommand = new LeaderboardCommand(timerStatsService)
+const userStatsCommand = new UserStatsCommand(timerStatsService)
 
-export const commands: Command[] = [wheelCommand, leaderboardCommand]
+export const commands: Command[] = [wheelCommand, leaderboardCommand, userStatsCommand]
 
 export const deployCommands = async () => {
   const token = process.env.DISCORD_TOKEN

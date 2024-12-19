@@ -1,9 +1,8 @@
 import moment from 'moment-timezone'
 import { TimerService } from '../timers/timer_service'
-import type { Timer } from '../types'
+import type { Timer, UserStats } from '../types'
 import { getJoinTimePercentage } from '../util/timer_utils'
 import { interpolateTimestamp } from '../util/moment_utils'
-import { UserStats } from '../commands/user_stats'
 
 export class TimerStatsService {
   private timerService: TimerService
