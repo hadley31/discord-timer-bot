@@ -1,5 +1,5 @@
-import { type ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, userMention, channelMention, Client } from 'discord.js'
-import type { Command, DiscordCommandOptions } from '../types'
+import { type ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, userMention, channelMention, Client, bold } from 'discord.js'
+import type { Command, DiscordCommandOptions, UserStats } from '../types'
 import { TimerStatsService } from '../stats/timer_stats_service'
 
 export class LeaderboardCommand implements Command {
@@ -14,36 +14,49 @@ export class LeaderboardCommand implements Command {
   async execute(interaction: ChatInputCommandInteraction) {
     const userStats = await this.timerStatsService.getTimerStatsByGuildId(interaction.guildId)
 
-    const sortedUserStats = userStats.sort((a, b) => b.onTimePercentage - a.onTimePercentage)
+    const sortedUserStats = userStats.sort((a, b) => b.joinTimeAccuracy - a.joinTimeAccuracy)
 
     const topUsers = sortedUserStats.slice(0, 3)
 
-    const userIdsToUsernames = new Map<string, string>()
-
-    for (const userStat of topUsers) {
-      userIdsToUsernames.set(userStat.userId, await this.userIdToUsername(interaction.client, userStat.userId))
-    }
+    const userIdsToUsernames = await this.createUserIdsToUsernamesMap(interaction, topUsers)
 
     interaction.reply({
       embeds: [
-        new EmbedBuilder()
-          .setTitle('Timer Leaderboard')
-          .setDescription('User Timer Stats')
-          .addFields([
-            ...topUsers.map((userStats, index) => ({
-              name: `${index + 1}. ${userIdsToUsernames.get(userStats.userId)}`,
-              value: `On Time Percentage: ${(userStats.onTimePercentage * 100).toFixed(0)}%\nTotal Timers: ${
-                userStats.totalTimers
-              }\nJoin Time Accuracy: ${(userStats.joinTimeAccuracy * 100).toFixed(0)}%`,
-              inline: true,
-            })),
-          ]),
+        new EmbedBuilder().setTitle('Timer Leaderboard').addFields([
+          ...topUsers.map((userStats, index) => ({
+            name: `${index + 1}. ${userIdsToUsernames.get(userStats.userId)}`,
+            value: this.timerStatsToEmbedFields(userStats),
+            inline: true,
+          })),
+        ]),
       ],
     })
   }
 
-  private async userIdToUsername(client: Client, userId: string) {
-    const user = await client.users.fetch(userId)
-    return user.username
+  private timerStatsToEmbedFields(userStats: UserStats): string {
+    const onTimePercentage = (userStats.onTimePercentage * 100).toFixed(0)
+    const joinTimeAccuracy = (userStats.joinTimeAccuracy * 100).toFixed(0)
+
+    const fields = {
+      'Total Timers': userStats.totalTimers.toString(),
+      'On Time Percentage': `${onTimePercentage}%`,
+      'Join Time Accuracy': `${joinTimeAccuracy}%`,
+      'Expired Timers': userStats.expiredTimers.toString(),
+    }
+
+    return Object.entries(fields)
+      .map(([name, value]) => `${name}: ${bold(value)}`)
+      .join('\n')
+  }
+
+  private async createUserIdsToUsernamesMap(interaction: ChatInputCommandInteraction, userStats: UserStats[]): Promise<Map<string, string>> {
+    const result = new Map<string, string>()
+
+    for (const userStat of userStats) {
+      const username = await interaction.guild.members.fetch(userStat.userId).then((member) => member.displayName)
+      result.set(userStat.userId, username)
+    }
+
+    return result
   }
 }

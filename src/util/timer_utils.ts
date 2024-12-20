@@ -14,6 +14,7 @@ const onInRegexes = [
     regex: /(one|two|three|four|five|ten|(?<!\w+)[\d\.]+)\s*(minutes?|mins?|m|hours?|hrs?|h|sec)?/,
     func: (n: string, u: string) => parseNumericWithUnit(n, u),
   },
+  { regex: /soon/i, func: () => 15 },
 ]
 
 const onAtRegex = /at\s*([\d:]+)/i
