@@ -33,6 +33,10 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     return
   }
 
+  if (reaction.message.author.bot) {
+    return
+  }
+
   for (const trigger of reactionTriggers) {
     try {
       if (await trigger.shouldExecute(reaction, user)) {
