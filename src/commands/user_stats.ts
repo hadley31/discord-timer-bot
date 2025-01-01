@@ -11,10 +11,12 @@ export class UserStatsCommand implements Command {
       .setName('stats')
       .setDescription('Get the leaderboard for timers for a user')
       .addUserOption((option) => option.setName('user').setDescription('The user to get stats for').setRequired(false))
+      .addBooleanOption((option) => option.setName('silent').setDescription('Only you can see the user stats').setRequired(false))
     this.timerStatsService = timerStatsService
   }
 
   async execute(interaction: ChatInputCommandInteraction) {
+    const silentOption = interaction.options.getBoolean('silent') ?? false
     const user = interaction.options.getUser('user') ?? interaction.user
     const userStats = await this.timerStatsService.getTimerStatsByUserId(user.id, interaction.guildId)
 
@@ -39,6 +41,7 @@ export class UserStatsCommand implements Command {
           },
         ]),
       ],
+      ephemeral: silentOption,
     })
   }
 }
