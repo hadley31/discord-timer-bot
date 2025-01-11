@@ -71,8 +71,11 @@ client.on(Events.MessageDelete, async (message) => {
     return
   }
 
-  logger.info(`A message was deleted: ${message.content}`)
-  message.channel.send(`A message was deleted:\n> ${message.content}`)
+  const prefix = 'A message was deleted:\n> '
+  const content = message.content.replace(prefix, '')
+
+  logger.info(`A message was deleted: ${content}`)
+  message.channel.send(`${prefix}${content}`)
 })
 
 client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
