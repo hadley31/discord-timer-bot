@@ -106,7 +106,7 @@ describe('parseOnInTime', async () => {
   for (const [message, minutes] of Object.entries(messages)) {
     describe(`when the message is '${message}'`, async () => {
       it(`should return ${minutes} minutes later`, async () => {
-        const expected = startTime.clone().add(minutes, 'minutes').endOf('minute')
+        const expected = startTime.clone().add(minutes, 'minutes')
 
         const result = parseOnInTime(message, { startTime })
 

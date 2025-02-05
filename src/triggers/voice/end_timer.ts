@@ -31,7 +31,20 @@ export class EndTimerVoiceTrigger implements VoiceTrigger {
 
     let timer = await this.timerService.getActiveTimerByUserId(userId, guildId)
 
-    timer.joinTime = moment()
+    var joinTime = moment()
+
+    var timerEndTimeStartOfMinute = timer.endTime.clone().startOf('minute')
+    var timerEndTimeEndOfMinute = timer.endTime.clone().endOf('minute').add(5, 'seconds')
+    var isTooEarly = timer.endTime.diff(joinTime, 'minutes') > 5 && getJoinTimePercentage(timer) < 0.3
+    var isEarly = joinTime.isBefore(timerEndTimeStartOfMinute)
+    var isLate = joinTime.isAfter(timerEndTimeEndOfMinute)
+    var isOnTime = joinTime.isBetween(timerEndTimeStartOfMinute, timerEndTimeEndOfMinute)
+
+    if (isOnTime) {
+      joinTime = timer.endTime
+    }
+
+    timer.joinTime = joinTime
     timer.isComplete = true
 
     timer = await this.timerService.saveTimer(timer)
@@ -47,15 +60,23 @@ export class EndTimerVoiceTrigger implements VoiceTrigger {
       unit = 'minutes'
     }
 
-    const earlyOrLate = deltaSeconds > 0 ? 'early' : 'late'
+    const originalMessage = await channel.messages.fetch(timer.messageId)
 
-    const message = await channel.messages.fetch(timer.messageId)
-
-    if (timer.endTime.diff(moment(), 'minutes') > 5 && getJoinTimePercentage(timer) < 0.3) {
-      await message.reply(`${userMention(userId)} joined ${bold('way too early')}. Shame on you!`)
+    if (isTooEarly) {
+      await originalMessage.reply(`${userMention(userId)} joined ${bold('way too early')}.`)
       return
     }
 
-    await message.reply(`${userMention(userId)} joined ${value} ${unit} ${bold(earlyOrLate)}`)
+    if (isEarly) {
+      await originalMessage.reply(`${userMention(userId)} joined ${value} ${unit} ${bold('early')}!`)
+      return
+    }
+
+    if (isLate) {
+      await originalMessage.reply(`${userMention(userId)} joined ${value} ${unit} ${bold('late')}!`)
+      return
+    }
+
+    await originalMessage.reply(`${userMention(userId)} joined on time!`)
   }
 }

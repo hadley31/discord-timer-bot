@@ -29,7 +29,7 @@ export class StartTimerTextTrigger implements TextTrigger {
       throw new TimerAlreadyExistsError(timer)
     }
 
-    const endTime = calculateTimerEndTime(message.content)
+    const endTime = calculateTimerEndTime(message.content.replace(/\d{5,}/g, ''))
 
     if (endTime == null) {
       throw new TimerCreationError(`Unable to parse end time from user message: '${message.content}'`)

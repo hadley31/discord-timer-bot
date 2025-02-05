@@ -42,7 +42,7 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
 
     const startTime = moment(reaction.message.createdAt)
 
-    const messageContent = reaction.message.content
+    const messageContent = reaction.message.content.replace(/\d{5,}/g, '')
 
     const endTime = reaction.emoji.name === '⏲️' ? parseOnInTime(messageContent, { startTime }) : parseOnAtTime(messageContent)
 

@@ -81,7 +81,7 @@ export const parseOnInTime = (message: string, options: ParseOptions = {}): mome
 
   const timestamp = options.startTime?.clone() || moment()
 
-  return timestamp.add(minutes, 'minute').endOf('minute')
+  return timestamp.add(minutes, 'minute')
 }
 
 export const parseOnAtTime = (message: string): moment.Moment => {
@@ -96,16 +96,16 @@ export const parseOnAtTime = (message: string): moment.Moment => {
   if (time.includes(':')) {
     const [hourOfDay, minuteOfHour] = time.split(':').map((n) => parseInt(n))
 
-    return createMomentFromHourAndMinute(hourOfDay, minuteOfHour).endOf('minute')
+    return createMomentFromHourAndMinute(hourOfDay, minuteOfHour)
   } else if (time.length <= 2) {
     const hourOfDay = parseInt(time)
 
-    return createMomentFromHourAndMinute(hourOfDay, 0).startOf('hour').endOf('minute')
+    return createMomentFromHourAndMinute(hourOfDay, 0).startOf('hour')
   } else {
     let hourOfDay = parseInt(time.slice(0, -2))
     const minuteOfHour = parseInt(time.slice(-2))
 
-    return createMomentFromHourAndMinute(hourOfDay, minuteOfHour).endOf('minute')
+    return createMomentFromHourAndMinute(hourOfDay, minuteOfHour)
   }
 }
 
