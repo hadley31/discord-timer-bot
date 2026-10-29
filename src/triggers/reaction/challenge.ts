@@ -23,15 +23,15 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
   }
 
   async execute(reaction: DiscordReaction, user: DiscordUser) {
-    if (reaction.message.member.voice.channel != null) {
+    if (reaction.message.member?.voice.channel != null) {
       throw new TimerCreationError('User is already in a voice channel')
     }
 
-    logger.info(`${user.username} reacted with ${reaction.emoji.name} to ${reaction.message.author.username}'s message`)
+    logger.info(`${user.username} reacted with ${reaction.emoji.name} to ${reaction.message.author!.username}'s message`)
 
-    const userId = reaction.message.author.id
+    const userId = reaction.message.author!.id
     const channelId = reaction.message.channel.id
-    const guildId = reaction.message.guild.id
+    const guildId = reaction.message.guild!.id
     const messageId = reaction.message.id
 
     const timer = await this.timerService.getActiveTimerByUserId(userId, guildId)
@@ -42,7 +42,7 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
 
     const startTime = moment(reaction.message.createdAt)
 
-    const messageContent = reaction.message.content.replace(/\d{5,}/g, '')
+    const messageContent = reaction.message.content!.replace(/\d{5,}/g, '')
 
     const endTime = reaction.emoji.name === '⏲️' ? parseOnInTime(messageContent, { startTime }) : parseOnAtTime(messageContent)
 
@@ -50,7 +50,7 @@ export class ChallengeReactionTrigger implements ReactionTrigger {
       throw new TimerCreationError(`Could not parse time from message content: ${messageContent}`)
     }
 
-    logger.info(`Starting timer for ${reaction.message.author.username} at ending at ${endTime}`)
+    logger.info(`Starting timer for ${reaction.message.author!.username} at ending at ${endTime}`)
 
     const newTimer = await this.timerService.createTimer({
       userId,
